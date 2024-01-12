@@ -1,13 +1,10 @@
-'use strict';
 var express = require ('express')
 var bodyParser = require('body-parser');
 var util = require('util');
 var cors = require('cors');
 var futil = require('./config/utility.js');
 var con = require ('./config/database.js');
-var routes = require('./routes');
-require('dotenv').config();
-
+var routes = require('./routes/index.js')
 require('dotenv').config();
 
 var app = express()
@@ -17,13 +14,14 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.options('*', cors())
-app.use(cors());
+const corsOptions = {
+    exposedHeaders: 'token',
+  };
+app.use(cors(corsOptions));
 
 
-app.use('/',routes.router)
 
-
-
+app.use(routes.router)
 
 var server = app.listen(process.env.SERVER_PORT, function () {
     var host = server.address().address;
