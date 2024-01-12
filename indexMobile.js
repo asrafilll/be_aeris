@@ -45,9 +45,6 @@ var server = app.listen(process.env.SERVER_PORT, function () {
         futil.logger.debug('\n' + futil.shtm() + '- [ DATABASE ERROR] | STARTING ' + util.inspect(error));
     }
 
-    // const intervalId = setInterval(() => {
-    //     // console.log('Interval executed!');
-    //    devices.LogDevices()
-    //   }, 1000);
+
 
 });
