@@ -25,15 +25,58 @@ app.use(bodyParser.json());
 //   };
 // app.use(cors(corsOptions));
 
-
-
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
-   });
-
-   app.get("/url", (req, res, next) => {
+app.get("/url", (req, res, next) => {
     res.json(["Tony","Lisa","Michael","Ginger","Food"]);
    });
+
+// route not found
+app.use((req, res, next) => {
+    const error = new Error('Not found');
+    error.message = 'Invalid route';
+    error.status = 404;
+    next(error);
+   });
+  // log errors to console
+   app.use(logErrors);
+    //
+   app.use(clientErrorHandler);
+   app.use((error, req, res, next) => {
+   res.status(error.status || 500);
+     return res.json({
+     status:error.status || 500,
+     message: error.message,
+     error: {
+     error: error.message,
+     },
+   });
+  });
+
+// log errors to console
+function logErrors(err, req, res, next) {
+ console.error(err.stack);
+ next(err);
+}
+// error handling for xhr request
+function clientErrorHandler(err, req, res, next) {
+ if (req.xhr) {
+   //console.log('xhr request');
+   res.status(400).send({status: 400, message: "Bad request from client", error: err.message });
+ } else {
+   next(err);
+ }
+}
+
+let port = process.env.PORT || 8081;
+app.listen(port, () => {
+ console.log(`Listening on port ${port}`);
+});
+
+
+// app.listen(3000, () => {
+//     console.log("Server running on port 3000");
+//    });
+
+
 
 // var server = app.listen(process.env.SERVER_PORT, function () {
 //     var host = server.address().address;
