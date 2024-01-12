@@ -4,7 +4,12 @@ var util = require('util');
 var cors = require('cors');
 var futil = require('./config/utility.js');
 var con = require ('./config/database.js');
-var routes = require('./routes/index.js')
+// var routes = require('./routes/index.js');
+
+var Vehicle_User = require('./controllers/vehicle_user.js');
+var Assets = require('./controllers/assets.js');
+var Auth = require('./controllers/auth.js');
+
 require('dotenv').config();
 
 var app = express()
@@ -19,9 +24,21 @@ const corsOptions = {
   };
 app.use(cors(corsOptions));
 
+app.get('/', function (req, res) {
+        futil.logger.debug('\n' + futil.shtm() + ' PATH: / ' );
+        res.send({message:'Router Working'})
+        res.end();
+    })
 
 
-app.use(routes.router)
+app.get('/api/pattern',function (req, res) {
+    futil.logger.debug('\n' + futil.shtm() + ' PATH: /api/pattern ' );
+    res.send({message:'Welcome Patern'})
+    res.end();
+})
+
+
+// app.use(routes.router)
 
 var server = app.listen(process.env.SERVER_PORT, function () {
     var host = server.address().address;

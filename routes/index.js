@@ -6,16 +6,16 @@ var router = express.Router();
 // var Assets = require('../controllers/assets.js');
 // var Auth = require('../controllers/auth.js');
 
-router.get('/', function (req, res) {
-    console.log("Router Working");
-    res.send({message:'Router Working'})
-    res.end();
-})
+// router.get('/', function (req, res) {
+//     console.log("Router Working");
+//     res.send({message:'Router Working'})
+//     res.end();
+// })
 
-router.get('/api/pattern',function (req, res) {
-    res.send({message:'Welcome Patern'})
-    res.end();
-})
+// router.get('/api/pattern',function (req, res) {
+//     res.send({message:'Welcome Patern'})
+//     res.end();
+// })
 
 // router.get('/api/pattern/latest_status/:sclId',Auth.authAccessToken,function (req, res){
 //     Assets.LatestStatus(req,res)
