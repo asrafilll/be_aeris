@@ -20,7 +20,7 @@ app.options('*', cors())
 app.use(cors());
 
 
-app.use(routes.router)
+app.use('/',routes.router)
 
 
 
