@@ -19,11 +19,11 @@ app.use('/api/pattern',indexRoute)
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.options('*', cors())
-const corsOptions = {
-    exposedHeaders: 'token',
-  };
-app.use(cors(corsOptions));
+// app.options('*', cors())
+// const corsOptions = {
+//     exposedHeaders: 'token',
+//   };
+// app.use(cors(corsOptions));
 
 
 
