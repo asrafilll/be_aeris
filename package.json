@@ -1,0 +1,46 @@
+{
+  "name": "pattern",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon indexMobile.js"
+  },
+  "author": "syerif",
+  "license": "ISC",
+  "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.3.33",
+    "amqplib": "^0.10.3",
+    "axios": "^1.4.0",
+    "body-parser": "^1.20.1",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "fs": "0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.40",
+    "multer": "^1.4.5-lts.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.0.1",
+    "nodemon": "^2.0.20",
+    "os": "^0.1.2",
+    "path": "^0.12.7",
+    "sequelize": "^6.28.0",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/shivavalkyre/Fleet_API_Mobile.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shivavalkyre/Fleet_API_Mobile/issues"
+  },
+  "homepage": "https://github.com/shivavalkyre/Fleet_API_Mobile#readme",
+  "description": ""
+}
