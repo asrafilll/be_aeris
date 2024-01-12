@@ -10,6 +10,7 @@ router.get('/', function (req, res,next) {
     console.log("Router Working");
     res.send({message:'Router Working'})
     res.end();
+    next();
 })
 
 // router.get('/api/pattern',function (req, res) {
