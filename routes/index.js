@@ -39,5 +39,5 @@ router.get('/api/pattern',function (req, res) {
 //     Auth.Login(req,res)
 // })
 
-module.exports.router = router
+module.exports = router
 

@@ -4,7 +4,7 @@ var util = require('util');
 var cors = require('cors');
 var futil = require('./config/utility.js');
 var con = require ('./config/database.js');
-var routes = require('./routes/index.js');
+var indexRoute = require('./routes/index.js');
 
 var Vehicle_User = require('./controllers/vehicle_user.js');
 var Assets = require('./controllers/assets.js');
@@ -14,7 +14,8 @@ require('dotenv').config();
 
 var app = express()
 
-app.use(routes.router)
+app.use('/api/pattern',indexRoute)
+
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
