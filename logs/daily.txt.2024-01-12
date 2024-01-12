@@ -23,3 +23,9 @@
 {"level":"debug","message":"\n12 Jan 2024 19:30:26 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
 {"level":"debug","message":"12 Jan 2024 19:30:26 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3005"}
 {"level":"debug","message":"\n12 Jan 2024 19:30:26 - [ DATABASE U P ] | STARTING 'db_fleet'"}
+{"level":"debug","message":"\n12 Jan 2024 22:19:48 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"12 Jan 2024 22:19:48 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3005"}
+{"level":"debug","message":"\n12 Jan 2024 22:19:48 - [ DATABASE U P ] | STARTING 'db_fleet'"}
+{"level":"debug","message":"\n12 Jan 2024 22:26:54 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"12 Jan 2024 22:26:54 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3005"}
+{"level":"debug","message":"\n12 Jan 2024 22:26:54 - [ DATABASE U P ] | STARTING 'db_fleet'"}
