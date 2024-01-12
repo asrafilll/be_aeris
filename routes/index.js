@@ -2,9 +2,9 @@
 var express = require ('express');
  // Init express router
 const router = express.Router();
-var Vehicle_User = require('../controllers/vehicle_user.js')
-var Assets = require('../controllers/assets.js')
-var Auth = require('../controllers/auth.js')
+// var Vehicle_User = require('../controllers/vehicle_user.js');
+// var Assets = require('../controllers/assets.js');
+// var Auth = require('../controllers/auth.js');
 
 router.get('/', function (req, res) {
     console.log("Router Working");
