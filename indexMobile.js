@@ -14,7 +14,7 @@ require('dotenv').config();
 
 var app = express()
 
-
+app.use(routes.router)
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -24,21 +24,9 @@ const corsOptions = {
   };
 app.use(cors(corsOptions));
 
-app.get('/', function (req, res) {
-        futil.logger.debug('\n' + futil.shtm() + ' PATH: / ' );
-        res.send({message:'Router Working'})
-        res.end();
-    })
 
 
-app.get('/api/pattern',function (req, res) {
-    futil.logger.debug('\n' + futil.shtm() + ' PATH: /api/pattern ' );
-    res.send({message:'Welcome Patern'})
-    res.end();
-})
 
-
-// app.use(routes.router)
 
 var server = app.listen(process.env.SERVER_PORT, function () {
     var host = server.address().address;
