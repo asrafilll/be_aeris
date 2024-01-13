@@ -40,5 +40,5 @@ router.post('/api/patern/auth',function (req, req) {
     Auth.Login(req,res)
 })
 
-module.exports = router
+module.exports.router = router
 

@@ -4,7 +4,8 @@ var util = require('util');
 var cors = require('cors');
 var futil = require('./config/utility.js');
 var con = require ('./config/database.js');
-var routes = require('./routes/index.js');
+var routes = require('./routes/index.js')
+// var devices = require('./controllers/device.js')
 require('dotenv').config();
 
 var app = express()
