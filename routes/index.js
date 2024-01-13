@@ -6,13 +6,8 @@ var Vehicle_User = require('../controllers/vehicle_user.js');
 var Assets = require('../controllers/assets.js');
 var Auth = require('../controllers/auth.js');
 
-router.get('/', function (req, res,next) {
-    console.log("Router Working");
-    res.send({message:'Router Working'})
-    res.end();
-})
 
-router.get('/api/pattern',function (req, res) {
+router.get('/api/pattern',function (req, res,next) {
     res.send({message:'Welcome Patern'})
     res.end();
 })
