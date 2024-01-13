@@ -35,7 +35,7 @@ router.get('/api/pattern/asset_address/:lat/:lng',Auth.authAccessToken,function 
 
 
 
-router.post('/api/patern/auth',function (req, req) {
+router.post('/api/pattern/auth',function (req, req) {
     Auth.Login(req,res)
 })
 
