@@ -26,6 +26,7 @@
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.0.1",
+    "nodemailer": "^6.9.9",
     "nodemon": "^2.0.20",
     "os": "^0.1.2",
     "path": "^0.12.7",
@@ -33,7 +34,6 @@
     "winston": "^3.8.2",
     "winston-daily-rotate-file": "^4.7.1"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://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@github.com/shivavalkyre/Fleet_API_Mobile.git"

@@ -29,10 +29,27 @@ router.get('/api/pattern/asset_address/:lat/:lng',Auth.authAccessToken,function 
 })
 
 
-
+//  Login
 router.post('/api/pattern/auth',function (req, res) {
     Auth.Login(req,res)
 })
+
+// Register
+
+router.post('/api/pattern/register',function (req, res) {
+    Auth.Register(req,res)
+})
+
+router.post('/api/pattern/change_password',function(req,res){
+    Auth.ChangePassword(req,res)
+})
+
+//  Forgot Password
+router.post('/api/pattern/forgot_password',function (req, res) {
+    Auth.ForgotPassword(req,res)
+})
+//  Logout
+
 
 module.exports.router = router
 
