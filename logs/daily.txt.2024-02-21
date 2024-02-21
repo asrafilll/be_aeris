@@ -14,3 +14,16 @@
 {"level":"debug","message":"\n21 Feb 2024 08:21:03 - [ CHANGE PASSWORD ] | INFO 'Petugas01'"}
 {"level":"debug","message":"\n21 Feb 2024 08:21:05 - [ ERROR ] | QUERING ReferenceError: result is not defined\n    at Object.ChangePassword (D:\\Mine\\Fleet\\API\\API MOBILE\\controllers\\auth.js:378:5)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)"}
 {"date":"Wed Feb 21 2024 08:21:05 GMT+0700 (Western Indonesia Time)","error":{},"exception":true,"level":"error","message":"uncaughtException: result is not defined\nReferenceError: result is not defined\n    at Object.ChangePassword (D:\\Mine\\Fleet\\API\\API MOBILE\\controllers\\auth.js:384:5)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)","os":{"loadavg":[0,0,0],"uptime":40745},"process":{"argv":["C:\\Program Files\\nodejs\\node.exe","D:\\Mine\\Fleet\\API\\API MOBILE\\indexMobile.js"],"cwd":"D:\\Mine\\Fleet\\API\\API MOBILE","execPath":"C:\\Program Files\\nodejs\\node.exe","gid":null,"memoryUsage":{"arrayBuffers":340343,"external":1416525,"heapTotal":25354240,"heapUsed":23058536,"rss":54276096},"pid":17604,"uid":null,"version":"v16.20.2"},"stack":"ReferenceError: result is not defined\n    at Object.ChangePassword (D:\\Mine\\Fleet\\API\\API MOBILE\\controllers\\auth.js:384:5)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)","trace":[{"column":5,"file":"D:\\Mine\\Fleet\\API\\API MOBILE\\controllers\\auth.js","function":"Object.ChangePassword","line":384,"method":"ChangePassword","native":false},{"column":5,"file":"node:internal/process/task_queues","function":"processTicksAndRejections","line":96,"method":null,"native":false}]}
+{"level":"debug","message":"\n21 Feb 2024 08:25:20 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"21 Feb 2024 08:25:20 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3003"}
+{"level":"debug","message":"\n21 Feb 2024 08:25:20 - [ DATABASE U P ] | STARTING 'db_fleet'"}
+{"level":"debug","message":"\n21 Feb 2024 08:26:07 - [ CHANGE PASSWORD ] | INFO { password: 'password1', data: 'eb7456193eefc44bf6874e488d2598c0' }"}
+{"level":"debug","message":"\n21 Feb 2024 08:26:07 - [ CHANGE PASSWORD ] | INFO 'Petugas01'"}
+{"level":"debug","message":"\n21 Feb 2024 08:27:00 - [ CHANGE PASSWORD ] | INFO { password: 'password1', data: 'eb7456193eefc44bf6874e488d2598c0' }"}
+{"level":"debug","message":"\n21 Feb 2024 08:27:00 - [ CHANGE PASSWORD ] | INFO 'Petugas01'"}
+{"level":"debug","message":"\n21 Feb 2024 08:27:40 - [ CHANGE PASSWORD ] | INFO { password: 'Password', data: 'eb7456193eefc44bf6874e488d2598c0' }"}
+{"level":"debug","message":"\n21 Feb 2024 08:27:40 - [ CHANGE PASSWORD ] | INFO 'Petugas01'"}
+{"level":"debug","message":"\n21 Feb 2024 08:32:25 - [ CHANGE PASSWORD ] | INFO { password: 'Password', data: 'eb7456193eefc44bf6874e488d2598c0' }"}
+{"level":"debug","message":"\n21 Feb 2024 08:32:25 - [ CHANGE PASSWORD ] | INFO 'Petugas01'"}
+{"level":"debug","message":"\n21 Feb 2024 08:34:42 - [ CHANGE PASSWORD ] | INFO { password: 'Password', data: 'eb7456193eefc44bf6874e488d2598c0' }"}
+{"level":"debug","message":"\n21 Feb 2024 08:34:42 - [ CHANGE PASSWORD ] | INFO 'Petugas01'"}

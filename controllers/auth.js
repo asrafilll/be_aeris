@@ -275,7 +275,7 @@ var ForgotPassword = async function  (req,res){
                 to: email,
                 subject: "Lupa Password",
                 text: "Harap klik link dibawah untuk lupa password",
-                html: '<p>Click <a href="http://localhost:3001/lupa_password/' + encrypted + '">here</a> to reset your password</p>'
+                html: '<p>Click <a href="http://147.139.144.120:3001/lupa_password/' + encrypted + '">here</a> to reset your password</p>'
               };
               
 
