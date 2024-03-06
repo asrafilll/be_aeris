@@ -5,6 +5,10 @@ var router = express.Router();
 var Vehicle_User = require('../controllers/vehicle_user.js');
 var Assets = require('../controllers/assets.js');
 var Auth = require('../controllers/auth.js');
+var Task = require('../controllers/task.js')
+var Vehicle = require('../controllers/vehicle.js')
+var util = require('util');
+var futil = require('../config/utility.js');
 
 
 router.get('/api/pattern',function (req, res,next) {
@@ -49,6 +53,58 @@ router.post('/api/pattern/forgot_password',function (req, res) {
     Auth.ForgotPassword(req,res)
 })
 //  Logout
+
+// Task
+
+// Task ===============================================================
+router.post('/api/pattern/tasks',Auth.authAccessToken,function(req,res){
+
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQ HEADERS ] | INFO ' + util.inspect(req.headers));
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQ BODY ] | INFO ' + util.inspect(req.body));
+    // futil.logger.debug('\n' + futil.shtm() + '- [ REQ FILE ] | INFO ' + util.inspect(req.file));
+    Task.Create(req,res)
+})
+
+router.get('/api/pattern/tasks',Auth.authAccessToken,function (req, res){
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQ HEADERS ] | INFO ' + util.inspect(req.headers));
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQ BODY ] | INFO ' + util.inspect(req.body));
+    Task.Read(req,res)
+})
+
+router.get('/api/pattern/tasks/:status',Auth.authAccessToken,function (req, res){
+    Task.ReadTaskByStatus(req,res)
+})
+
+router.get('/api/pattern/tasks/status/user/:id',Auth.authAccessToken,function (req, res){
+    Task.ReadTotalStatusPerUser(req,res)
+})
+
+router.get('/api/pattern/tasks/user/:id',Auth.authAccessToken,function (req, res){
+    Task.ReadTaskUser(req,res)
+})
+
+router.get('/api/pattern/tasks/filter/:id',Auth.authAccessToken,function (req, res){
+    Task.TaskFilter(req,res)
+})
+
+router.put('/api/pattern/tasks/:id',Auth.authAccessToken,function (req, res){
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQ FILE ] | INFO ' + util.inspect(req.file));
+    Task.Update(req,res)
+})
+
+router.delete('/api/pattern/tasks/:id',function (req, res){
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADERS ] | INFO ' + util.inspect(req.headers));
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST PARAMS ] | INFO ' + util.inspect(req.params));
+    // futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST BODY ] | INFO ' + util.inspect(req.body));
+    Task.Delete(req,res)
+})
+
+// ============================= ODOMETER ============================================================
+
+router.get('/api/pattern/vehicle/odometer/:vehicleid',Auth.authAccessToken,function (req, res){
+    Vehicle.ReadOdometer(req,res)
+})
+
 
 
 module.exports.router = router
