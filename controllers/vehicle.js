@@ -45,7 +45,7 @@ var ReadOdometer = async function(req,res){
             });
 
             futil.logger.debug('\n' + futil.shtm() + '- [ RESULT VEHICLE ALL] | QUERING ' + util.inspect(resp));
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESULT VEHICLE ALL] | QUERING ' + util.inspectresp.init_odometer
+            futil.logger.debug('\n' + futil.shtm() + '- [ RESULT VEHICLE ALL] | QUERING ' + util.inspectresp.init_odometer)
             // var rows_data = []
             // rows_data.push(result)
             var j=1
