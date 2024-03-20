@@ -22,7 +22,6 @@ const corsOptions = {
   };
 app.use(cors(corsOptions));
 
-
 app.use(fileUpload());
 app.use(routes.router)
 

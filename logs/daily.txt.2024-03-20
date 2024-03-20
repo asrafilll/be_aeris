@@ -221,3 +221,29 @@
 {"level":"debug","message":"\n20 Mar 2024 11:04:42 - [ REQ FILE ] | INFO [Object: null prototype] {\n  image_task: {\n    name: 'office1.jpeg',\n    data: <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 01 00 48 00 48 00 00 ff e2 02 1c 49 43 43 5f 50 52 4f 46 49 4c 45 00 01 01 00 00 02 0c 6c 63 6d 73 02 10 00 00 ... 161681 more bytes>,\n    size: 161731,\n    encoding: '7bit',\n    tempFilePath: '',\n    truncated: false,\n    mimetype: 'image/jpeg',\n    md5: '45b94c03a22b08c9be4adda6272d2a53',\n    mv: [Function: mv]\n  }\n}"}
 {"level":"debug","message":"\n20 Mar 2024 11:04:42 - [ UPLOAD PATH ] | INFO 'D:\\\\Mine\\\\Fleet\\\\API\\\\API MOBILE\\\\public\\\\uploads\\\\office1.jpeg'"}
 {"level":"debug","message":"\n20 Mar 2024 11:04:42 - [ REQ BODY  ] | INFO {\n  userid: '2',\n  user_lat: '106.00080780',\n  user_lon: '71.07807070',\n  task_time: '17:30',\n  task_status: 'Pending',\n  vehicleid: 'TJZT48V500W22071001544',\n  vehicle_lat: '106.00080780',\n  vehicle_lon: '71.07807070',\n  path: 'D:\\\\Mine\\\\Fleet\\\\API\\\\API MOBILE\\\\public\\\\uploads\\\\office1.jpeg',\n  filename: 'office1.jpeg'\n}"}
+{"level":"debug","message":"\n20 Mar 2024 11:06:37 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"20 Mar 2024 11:06:37 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3003"}
+{"level":"debug","message":"\n20 Mar 2024 11:06:37 - [ DATABASE U P ] | STARTING 'db_fleet'"}
+{"level":"debug","message":"\n20 Mar 2024 11:06:47 - [ HEADERS ] | INFO {\n  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBldHVnYXMwMSIsImlhdCI6MTcwNDk2OTYzM30.Om_FwascreanHvFp__u9AG55XfFjh_Bxu_lZApzWalc',\n  'user-agent': 'PostmanRuntime/7.29.2',\n  accept: '*/*',\n  'cache-control': 'no-cache',\n  'postman-token': '80667ea3-f4e3-4077-a891-3f515d4da6f9',\n  host: 'localhost:3003',\n  'accept-encoding': 'gzip, deflate, br',\n  connection: 'keep-alive',\n  'content-type': 'multipart/form-data; boundary=--------------------------159717767881960003419816',\n  'content-length': '162893'\n}"}
+{"level":"debug","message":"\n20 Mar 2024 11:06:47 - [ TOKEN ] | INFO 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBldHVnYXMwMSIsImlhdCI6MTcwNDk2OTYzM30.Om_FwascreanHvFp__u9AG55XfFjh_Bxu_lZApzWalc'"}
+{"level":"debug","message":"\n20 Mar 2024 11:06:47 - [ REQ FILE ] | INFO [Object: null prototype] {\n  image_task: {\n    name: 'office1.jpeg',\n    data: <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 01 00 48 00 48 00 00 ff e2 02 1c 49 43 43 5f 50 52 4f 46 49 4c 45 00 01 01 00 00 02 0c 6c 63 6d 73 02 10 00 00 ... 161681 more bytes>,\n    size: 161731,\n    encoding: '7bit',\n    tempFilePath: '',\n    truncated: false,\n    mimetype: 'image/jpeg',\n    md5: '45b94c03a22b08c9be4adda6272d2a53',\n    mv: [Function: mv]\n  }\n}"}
+{"level":"debug","message":"\n20 Mar 2024 11:06:47 - [ UPLOAD PATH ] | INFO 'D:\\\\Mine\\\\Fleet\\\\API\\\\API MOBILE\\\\public\\\\uploads\\\\office1.jpeg'"}
+{"level":"debug","message":"\n20 Mar 2024 11:06:47 - [ REQ BODY  ] | INFO {\n  userid: '2',\n  user_lat: '106.00080780',\n  user_lon: '71.07807070',\n  task_time: '17:30',\n  task_status: 'Pending',\n  vehicleid: 'TJZT48V500W22071001544',\n  vehicle_lat: '106.00080780',\n  vehicle_lon: '71.07807070',\n  path: 'D:\\\\Mine\\\\Fleet\\\\API\\\\API MOBILE\\\\public\\\\uploads\\\\office1.jpeg',\n  filename: 'office1.jpeg'\n}"}
+{"level":"debug","message":"\n20 Mar 2024 11:18:48 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"20 Mar 2024 11:18:48 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3003"}
+{"level":"debug","message":"\n20 Mar 2024 11:18:48 - [ DATABASE U P ] | STARTING 'db_fleet'"}
+{"level":"debug","message":"\n20 Mar 2024 11:22:04 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"20 Mar 2024 11:22:04 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3003"}
+{"level":"debug","message":"\n20 Mar 2024 11:22:04 - [ DATABASE U P ] | STARTING 'db_fleet'"}
+{"level":"debug","message":"\n20 Mar 2024 11:25:22 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"20 Mar 2024 11:25:22 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3003"}
+{"level":"debug","message":"\n20 Mar 2024 11:25:22 - [ DATABASE U P ] | STARTING 'db_fleet'"}
+{"level":"debug","message":"\n20 Mar 2024 11:29:45 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"20 Mar 2024 11:29:45 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3003"}
+{"level":"debug","message":"\n20 Mar 2024 11:29:45 - [ DATABASE U P ] | STARTING 'db_fleet'"}
+{"level":"debug","message":"\n20 Mar 2024 11:30:17 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"20 Mar 2024 11:30:17 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3003"}
+{"level":"debug","message":"\n20 Mar 2024 11:30:17 - [ DATABASE U P ] | STARTING 'db_fleet'"}
+{"level":"debug","message":"\n20 Mar 2024 11:32:18 - [ W A K E   U P ] | STARTING 'PATERN CONTROLLER ADAPTER'"}
+{"level":"debug","message":"20 Mar 2024 11:32:18 - [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: 3003"}
+{"level":"debug","message":"\n20 Mar 2024 11:32:18 - [ DATABASE U P ] | STARTING 'db_fleet'"}

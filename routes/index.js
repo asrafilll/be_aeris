@@ -90,6 +90,10 @@ router.get('/api/pattern/tasks/filter/:id',Auth.authAccessToken,function (req, r
     Task.TaskFilter(req,res)
 })
 
+router.get('/api/pattern/tasks/image/:filename',Auth.authAccessToken,function (req, res){
+    Task.Download(req,res)
+})
+
 router.put('/api/pattern/tasks/:id',Auth.authAccessToken,function (req, res){
     futil.logger.debug('\n' + futil.shtm() + '- [ REQ FILE ] | INFO ' + util.inspect(req.files));
     Task.Update(req,res)

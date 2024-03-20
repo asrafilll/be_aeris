@@ -441,6 +441,20 @@ var Delete = async function (req,res){
     }
 }
 
+var Download = async function (req,res){
+    const fileName = req.params.filename;
+    // const directoryPath = __basedir + "/resources/static/assets/uploads/";
+    var downloadPath = path.join(__dirname , '../public/uploads/');
+
+    res.download(downloadPath + fileName, fileName, (err) => {
+        if (err) {
+        res.status(500).send({
+            message: "Could not download the file. " + err,
+        });
+        }
+    });
+}
+
 module.exports = {
     Create,
     Read,
@@ -449,5 +463,6 @@ module.exports = {
     ReadTaskUser,
     TaskFilter,
     Update,
-    Delete
+    Delete,
+    Download
 }
