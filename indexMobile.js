@@ -4,7 +4,9 @@ var util = require('util');
 var cors = require('cors');
 var futil = require('./config/utility.js');
 var con = require ('./config/database.js');
-var routes = require('./routes/index.js')
+var routes = require('./routes/index.js');
+const path = require("path");
+const fileUpload = require('express-fileupload');
 // var devices = require('./controllers/device.js')
 require('dotenv').config();
 
@@ -21,8 +23,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-
+app.use(fileUpload());
 app.use(routes.router)
+
 
 var server = app.listen(process.env.SERVER_PORT, function () {
     var host = server.address().address;

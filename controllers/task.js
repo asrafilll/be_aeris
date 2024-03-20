@@ -7,8 +7,11 @@ var ModelTask = require('../models/task.js')
 var Task = ModelTask.Task
 var ModelUser = require('../models/user.js')
 var User = ModelUser.User
-const multer = require("multer");
-const upload = multer({ dest: "public/uploads" });
+const path = require("path");
+// const multer = require("multer");
+// const upload = multer({ dest: "public/uploads" });
+
+// const fileUpload = require('express-fileupload');
 
 var util = require('util');
 var futil = require('../config/utility.js');
@@ -281,18 +284,60 @@ var ReadTaskUser = async function(req,res){
 var Update = async function (req,res){
     try {
 
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST BODY ] | INFO ' + util.inspect(req.body));
+        // futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST BODY ] | INFO ' + util.inspect(req.body));
+
+        let sampleFile;
+        let uploadPath;
+      
+        if (!req.files || Object.keys(req.files).length === 0) {
+            //   return res.status(400).send('No files were uploaded.');
+            // update tanpa image
+
+            futil.logger.debug('\n' + futil.shtm() + '- [ UPDATE TANPA IMAGE ]');
+
+            const task = await Task.update(req.body, {
+                where: {
+                    id: req.params.id
+                }
+            });
+            
+            result.code = 200
+            result.status ="success"
+            result.data = "Update data success"
+            res.send(result);
+
+        }else{
+
+            sampleFile = req.files.image_task;
+            uploadPath = path.join(__dirname , '../public/uploads/' , sampleFile.name);
+
+            futil.logger.debug('\n' + futil.shtm() + '- [ UPLOAD PATH ] | INFO ' + util.inspect(uploadPath));
+
+            sampleFile.mv(uploadPath, async function(err) {
+                if (err)
+                  return res.status(500).send(err);
+            
+                    // res.send('File uploaded!');
+
+                    req.body.path = uploadPath;
+                    req.body.filename = sampleFile.name;
         
-        const task = await Task.update(req.body, {
-            where: {
-                id: req.params.id
-            }
-        });
+                    const task = await Task.update(req.body, {
+                        where: {
+                            id: req.params.id
+                        }
+                    });
+                    
+                    result.code = 200
+                    result.status ="success"
+                    result.data = "Update data success"
+                    res.send(result);
+              });
+
+           
+        }
         
-        result.code = 200
-        result.status ="success"
-        result.data = "Update data success"
-        res.send(result);
+
     } catch (err) {
         futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
         result.code = 400

@@ -9,6 +9,9 @@ var Task = require('../controllers/task.js')
 var Vehicle = require('../controllers/vehicle.js')
 var util = require('util');
 var futil = require('../config/utility.js');
+const path = require("path");
+const fileUpload = require('express-fileupload');
+
 
 
 router.get('/api/pattern',function (req, res,next) {
@@ -88,7 +91,7 @@ router.get('/api/pattern/tasks/filter/:id',Auth.authAccessToken,function (req, r
 })
 
 router.put('/api/pattern/tasks/:id',Auth.authAccessToken,function (req, res){
-    futil.logger.debug('\n' + futil.shtm() + '- [ REQ FILE ] | INFO ' + util.inspect(req.file));
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQ FILE ] | INFO ' + util.inspect(req.files));
     Task.Update(req,res)
 })
 
