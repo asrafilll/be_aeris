@@ -49,6 +49,12 @@ const Task = con.db.define('tasks', {
     },
     vehicle_lon:{
       type: DataTypes.STRING
+    },
+    path:{
+      type: DataTypes.TEXT
+    },
+    filename:{
+      type: DataTypes.STRING
     }
   },{
     // Freeze Table Name

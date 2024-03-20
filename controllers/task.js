@@ -321,6 +321,8 @@ var Update = async function (req,res){
 
                     req.body.path = uploadPath;
                     req.body.filename = sampleFile.name;
+
+                    futil.logger.debug('\n' + futil.shtm() + '- [ REQ BODY  ] | INFO ' + util.inspect(req.body));
         
                     const task = await Task.update(req.body, {
                         where: {
