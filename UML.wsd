@@ -1,0 +1,118 @@
+@startuml
+class User {
+  - id: int {PK}
+  - username: varchar(255)
+  - password: varchar(255)
+  - level: varchar(255)
+  - ph_number: varchar(25)
+  - area: varchar(25)
+  - email: varchar(255)
+  - createdBy: int {FK}
+}
+
+class Vehicle {
+  - id: int {PK}
+  - vehicleid: varchar(255)
+  - vehicle_brand: varchar(255)
+  - vehicle_type: varchar(255)
+  - vehicle_condition: varchar(255)
+  - name: varchar(255)
+  - vin: varchar(255)
+  - license_plate: varchar(255)
+  - deviceId: varchar(255)
+  - power_status: varchar(255)
+  - ign_status: varchar(255)
+  - speed: varchar(255)
+  - operating_time: datetime
+  - tagging: varchar(255)
+  - assignment: int
+  - createdBy: int {FK}
+  - simId: varchar(255)
+  - init_odometer: int
+}
+
+class VehicleUser {
+  - id: int {PK}
+  - vehicleid: varchar(255) {FK}
+  - userid: int {FK}
+  - sclid: varchar(255)
+}
+
+class PlaceIn {
+  - id: int {PK}
+  - in_code: varchar(255)
+  - vehicleUid: varchar(255) {FK}
+  - place: varchar(255)
+  - in_date: timestamp
+}
+
+class PlaceOut {
+  - id: int {PK}
+  - out_code: varchar(255)
+  - vehicleUid: varchar(255) {FK}
+  - place: varchar(255)
+  - out_date: timestamp
+}
+
+class Task {
+  - id: int {PK}
+  - task: varchar(255)
+  - task_date: date
+  - task_time: time
+  - task_address: varchar(255)
+  - task_lat: varchar(255)
+  - task_lon: varchar(255)
+  - task_status: varchar(255)
+  - task_type: varchar(255)
+  - userid: int {FK}
+  - user_lat: varchar(255)
+  - user_lon: varchar(255)
+  - vehicleid: varchar(255) {FK}
+  - vehicle_lat: varchar(255)
+  - vehicle_lon: varchar(255)
+  - desc: varchar(255)
+  - path: varchar(255)
+  - filename: varchar(255)
+  - recurrent: varchar(255)
+  - createdBy: int {FK}
+}
+
+class VehiclePerawatan {
+  - id: int {PK}
+  - nama: varchar(255)
+  - vehicleId: varchar(255) {FK}
+  - plat_number: varchar(255)
+  - stnk: datetime
+  - stnk_perpanjang: datetime
+  - odometer: varchar(255)
+  - type: varchar(255)
+  - ban: varchar(255)
+}
+
+class SentWA {
+  - id: int {PK}
+  - sent_to: varchar(255)
+  - message: varchar(255)
+  - send_date: datetime
+}
+
+class WebhookWA {
+  - id: int {PK}
+  - from: varchar(255)
+  - message: varchar(255)
+  - file: varchar(255)
+  - timestamp: datetime
+}
+
+User "1" -- "*" Task
+User "1" -- "*" Vehicle
+
+Vehicle "1" -- "*" VehicleUser
+Vehicle "1" -- "*" PlaceIn
+Vehicle "1" -- "*" PlaceOut
+Vehicle "*" -- "1" Task
+Vehicle "1" -- "*" VehiclePerawatan
+
+Task "*" -- "1" User
+
+@enduml
