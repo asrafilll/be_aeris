@@ -43,5 +43,8 @@
     "url": "https://github.com/shivavalkyre/Fleet_API_Mobile/issues"
   },
   "homepage": "https://github.com/shivavalkyre/Fleet_API_Mobile#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "sequelize-cli": "^6.6.2"
+  }
 }

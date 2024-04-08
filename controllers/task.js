@@ -1,468 +1,549 @@
-// var ModelTask = require('../models/task.js')
-// var Task = ModelTask.Task
 const db = require("../models");
-var sequelize = require('sequelize')
-const { Op } = require('sequelize');
-var ModelTask = require('../models/task.js')
-var Task = ModelTask.Task
-var ModelUser = require('../models/user.js')
-var User = ModelUser.User
+const { Op } = require("sequelize");
+const ModelTask = require("../models/task.js");
+const Task = ModelTask.Task;
+const ModelUser = require("../models/user.js");
+const User = ModelUser.User;
 const path = require("path");
-// const multer = require("multer");
-// const upload = multer({ dest: "public/uploads" });
+const util = require("util");
+const futil = require("../config/utility.js");
 
-// const fileUpload = require('express-fileupload');
+const result = {
+  code: "",
+  status: "",
+  data: null,
+};
 
-var util = require('util');
-var futil = require('../config/utility.js');
-const { stat } = require('fs/promises');
-var result = {
-    "code":"",
-    "status":""
-}
+/**
+ * Membuat task baru.
+ *
+ * @param {Object} req - Objek permintaan, berisi detail task yang akan dibuat.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan hasil operasi ke pengguna.
+ * @returns {Promise<void>}
+ */
+const Create = async function (req, res) {
+  try {
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ REQ PARAMS ] | INFO " +
+        util.inspect(req.headers)
+    );
+    const task = await Task.create(req.body);
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ RESULT TASK CREATE] | QUERING " +
+        util.inspect(task)
+    );
 
-var Create = async function(req,res){
-    try {
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS ] | INFO ' + util.inspect(req.headers));
-        const task = await Task.create(req.body);
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT TASK CREATE] | QUERING ' + util.inspect(task));
-        result.code = 200
-        result.status ="success"
-        result.data = "New data inserted"
-        res.send(result);
-    } catch (err) {
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        result.code = 400
-        result.status ="failed"
-        result.data = "Insert data failed"
-        res.send(result);
-    }
-}
+    result.code = 200;
+    result.status = "success";
+    result.data = task;
 
+    res.status(201).json(result);
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
 
-var Read = async function(req,res){
-    try {
+    result.code = 500;
+    result.status = "failed";
+    result.data = "Insert data failed";
 
-        
+    res.status(500).json(result);
+  }
+};
 
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS ] | INFO ' + util.inspect(req.headers));
-        // futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  page] | INFO ' + util.inspect(req.headers.page));
-        // futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  rows] | INFO ' + util.inspect(req.headers.rows));
-        // futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  offset] | INFO ' + util.inspect(req.headers.offset));
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  createdby] | INFO ' + util.inspect(req.headers.createdby));
+/**
+ * Mengembalikan daftar semua task.
+ *
+ * @param {Object} req - Objek permintaan.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan hasil operasi ke pengguna.
+ * @returns {Promise<void>}
+ */
+const Read = async function (req, res) {
+  try {
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ REQ PARAMS ] | INFO " +
+        util.inspect(req.headers)
+    );
 
-        // var createdby = parseInt(req.headers.createdby)
+    const count = await Task.count();
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ RESULT COUNT ] | QUERING " +
+        util.inspect(count)
+    );
 
-        const count = await Task.count({
-            // where: {
-            //     createdBy: createdby
-            // }
-        });
+    await UpdateStatus();
 
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT COUNT ] | QUERING ' + util.inspect(count));
-
-        // var limit = parseInt(req.headers.rows)
-        // var offset = parseInt(req.headers.offset)
-        // var page = parseInt(req.headers.page)
-        // var createdby = parseInt(req.headers.createdby)
-
-        //update status overdue
-        await UpdateStatus()
-        // futil.logger.debug('\n' + futil.shtm() + '- [ UPDATE STATUS ] | QUERING ' + util.inspect(res_update));
-
-        
-        var resp = await Task.findAll({ raw:true,
-          
-           
-           order: [
-            ['id', 'ASC'],
-           
-            ]
-        });
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT TASK] | QUERING ' + util.inspect(resp));
-        // var rows_data = []
-        // rows_data.push(result)
-        offset = 0;
-        var j
-        if (offset == 0 ){
-            j=1
-        }else{
-            j= (offset * (page-1))+1
-        }
-
-        for (i=0;i<=resp.length-1;i++){
-            var status = 0
-            var task_status = resp[i].task_status
-            
-            if (task_status == 'In Complete'){
-                status = 1
-            }else if (task_status == 'Overdue'){
-                status = 2
-            }else if ( task_status == 'In Progress'){
-                status = 3
-            }else if(task_status =='Complete'){
-                status = 4
-            }
-            resp[i].status = status 
-            resp[i].no = j
-            j++
-        }
-
-
-
-        var response = {"total":count,"rows":resp}   
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT RESPONSE] | QUERING ' + util.inspect(response));  
-        result.code = 200
-        result.status ="success"
-        result.data = response
-        res.send(result);
-    //     res.status(200).send(task);
-    } catch (err) {
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        result.code = 400
-        result.status ="failed"
-        result.data = "Read data failed"
-        res.send(result);
-    }
-}
-
-
-var ReadTotalStatusPerUser = async function (req,res){
-    try {
-        const task = await Task.findAll({
-            group: [ 'task_status' ],
-            attributes :['task_status',
-                [sequelize.fn('COUNT', sequelize.col('task_status')), 'total'],
-            ],
-            where: { userid: req.params.id }
-        });
-
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT ] | QUERING ' + util.inspect(task));
-        result.code = 200
-        result.status ="success"
-        result.data = task
-        res.send(result);
-        // res.status(200).send(task);
-    } catch (err) {
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        result.code = 400
-        result.status ="failed"
-        result.data = "Read data failed"
-        res.send(result);
-    }
-}
-
-
-var ReadTaskByStatus = async function(req,res){
-    try {
-
-        
-
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS ] | INFO ' + util.inspect(req.headers));
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  page] | INFO ' + util.inspect(req.headers.page));
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  rows] | INFO ' + util.inspect(req.headers.rows));
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  offset] | INFO ' + util.inspect(req.headers.offset));
-
-        const count = await Task.count();
-
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT COUNT ] | QUERING ' + util.inspect(count));
-
-        // var limit = parseInt(req.headers.rows)
-        // var offset = parseInt(req.headers.offset)
-        // var page = parseInt(req.headers.page)
-        var status = req.params.status
-        futil.logger.debug('\n' + futil.shtm() + '- [ TASK STATUS ] | QUERING ' + util.inspect(status));
-        //update status overdue
-        await UpdateStatus()
-        // futil.logger.debug('\n' + futil.shtm() + '- [ UPDATE STATUS ] | QUERING ' + util.inspect(res_update));
-
-        
-        var resp = await Task.findAll({ raw:true,
-            // include: [{
-            //     model: User,
-            //     as: 'users',
-            //     attributes: ['username']
-            // }],
-           where: { task_status: status },
-           order: [
-            ['id', 'ASC'],
-           
-            ]
-        });
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT TASK] | QUERING ' + util.inspect(resp));
-        // var rows_data = []
-        // rows_data.push(result)
-        offset=0
-        var j
-        if (offset == 0 ){
-            j=1
-        }else{
-            j= (offset * (page-1))+1
-        }
-
-        for (i=0;i<=resp.length-1;i++){
-            var status = 0
-            var task_status = resp[i].task_status
-            
-            if (task_status == 'In Complete'){
-                status = 1
-            }else if (task_status == 'Overdue'){
-                status = 2
-            }else if ( task_status == 'In Progress'){
-                status = 3
-            }else if(task_status =='Complete'){
-                status = 4
-            }
-            resp[i].status = status 
-            resp[i].no = j
-            j++
-        }
-
-
-
-        var response = {"total":count,"rows":resp}   
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT RESPONSE] | QUERING ' + util.inspect(response));  
-        result.code = 200
-        result.status ="success"
-        result.data = response
-        res.send(result);
-    //     res.status(200).send(task);
-    } catch (err) {
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        result.code = 400
-        result.status ="failed"
-        result.data = "Read data failed"
-        res.send(result);
-    }
-}
-
-var TaskFilter = async function (req,res){
-    try{
-        const task = await Task.findAll({
-            where: { 
-                userid: req.params.id,
-                task_date: new Date(req.body.task_date),
-                task_status: req.body.task_status,
-                task_type: req.body.task_type
-            }
-        });
-
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT ] | QUERING ' + util.inspect(task));
-        result.code = 200
-        result.status ="success"
-        result.data = task
-        res.send(result);
-    }catch (err){
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        result.code = 400
-        result.status ="failed"
-        result.data = "Read data failed"
-        res.send(result);
-    }
-}
-
-var ReadTaskUser = async function(req,res){
-    try {
-        const task = await Task.findAll({
-            where: { userid: req.params.id }
-        });
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT ] | QUERING ' + util.inspect(task));
-        result.code = 200
-        result.status ="success"
-        result.data = task
-        res.send(result);
-        // res.status(200).send(task);
-    } catch (err) {
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        result.code = 400
-        result.status ="failed"
-        result.data = "Read data failed"
-        res.send(result);
-    }
-}
-
-var Update = async function (req,res){
-    try {
-
-        // futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST BODY ] | INFO ' + util.inspect(req.body));
-
-        let sampleFile;
-        let uploadPath;
-      
-        if (!req.files || Object.keys(req.files).length === 0) {
-            //   return res.status(400).send('No files were uploaded.');
-            // update tanpa image
-
-            futil.logger.debug('\n' + futil.shtm() + '- [ UPDATE TANPA IMAGE ]');
-
-            const task = await Task.update(req.body, {
-                where: {
-                    id: req.params.id
-                }
-            });
-            
-            result.code = 200
-            result.status ="success"
-            result.data = "Update data success"
-            res.send(result);
-
-        }else{
-
-            sampleFile = req.files.image_task;
-            uploadPath = path.join(__dirname , '../public/uploads/' , sampleFile.name);
-
-            futil.logger.debug('\n' + futil.shtm() + '- [ UPLOAD PATH ] | INFO ' + util.inspect(uploadPath));
-
-            sampleFile.mv(uploadPath, async function(err) {
-                if (err)
-                  return res.status(500).send(err);
-            
-                    // res.send('File uploaded!');
-
-                    req.body.path = uploadPath;
-                    req.body.filename = sampleFile.name;
-
-                    futil.logger.debug('\n' + futil.shtm() + '- [ REQ BODY  ] | INFO ' + util.inspect(req.body));
-        
-                    const task = await Task.update(req.body, {
-                        where: {
-                            id: req.params.id
-                        }
-                    });
-                    
-                    result.code = 200
-                    result.status ="success"
-                    result.data = "Update data success"
-                    res.send(result);
-              });
-
-           
-        }
-        
-
-    } catch (err) {
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        result.code = 400
-        result.status ="failed"
-        result.data = "Update data failed"
-        res.send(result);
-    }
-}
-
-var UpdateStatus = async function (){
-    try{
-        const task = await Task.findAll();
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT ] | QUERING ' + util.inspect(task));
-
-        var current_date  = futil.currentDate()
-        futil.logger.debug('\n' + futil.shtm() + '- [ CURRENT DATE ] | INFO ' + util.inspect(current_date));
-        let date_1 = new Date(current_date);
-       
-
-        for (i=0;i<=task.length-1;i++){
-           var task_date = task[i].task_date 
-           let date_2 = new Date(task_date);
-           var days = futil.dayDiffrence(date_1,date_2)
-           futil.logger.debug('\n' + futil.shtm() + '- [ DAYS ] | INFO ' + util.inspect(days));
-           var user_lat = task[i].user_lat
-           var user_lon = task[i].user_lon
-           var vehicle_lat = task[i].vehicle_lat
-           var vehicle_lon = task[i].vehicle_lon
-           var userid = task[i].userid
-           var id = task[i].id
-
-           if(!userid){
-                futil.logger.debug('\n' + futil.shtm() + '- [ USERS NULL ] | INFO ');
-           }else{
-                if(days>0){
-                    // check task status
-                    var task_status = task[i].task_status
-                    if (task_status != 'Overdue'){
-                        if (!user_lat && !user_lon && !vehicle_lat && !vehicle_lon){
-                            try{
-
-                                var res_update = await Task.update({task_status: 'Overdue'},{
-                                    where: {
-                                        id: id
-                                    }
-                                });
-                                
-                                // await User.update({token:token},{
-                                //     where: {
-                                //         email:email
-                                //     }
-                                // });
-                                
-
-                                futil.logger.debug('\n' + futil.shtm() + '- [ RESP UPDATE] | INFO ' + util.inspect(res_update));
-                            } catch (err){
-                                futil.logger.debug('\n' + futil.shtm() + '- [ UPDATE ERROR ] | INFO ' + util.inspect(err));
-                            }
-                           
-                        }else{
-                            var res_update = await Task.update({task_status: 'Complete'},{
-                                where: {
-                                    id: id
-                                }
-                            });
-                        }
-                    }
-                    // task status update to overdue
-                }
-           }
-          
-        }
-
-    }catch (err){
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-    }
-}
-
-var Delete = async function (req,res){
-    try {
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST PARAM ] | INFO ' + util.inspect(req.params));
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST BODY ] | INFO ' + util.inspect(req.body));
-
-        await Task.destroy({
-            where: {
-                id: req.params.id
-            }
-        });
-        result.code = 200
-        result.status ="success"
-        result.data = "Delete data success"
-        res.send(result);
-    } catch (err) {
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        result.code = 400
-        result.status ="failed"
-        result.data = "Delete data failed"
-        res.send(result);
-    }
-}
-
-var Download = async function (req,res){
-    const fileName = req.params.filename;
-    // const directoryPath = __basedir + "/resources/static/assets/uploads/";
-    var downloadPath = path.join(__dirname , '../public/uploads/');
-
-    res.download(downloadPath + fileName, fileName, (err) => {
-        if (err) {
-        res.status(500).send({
-            message: "Could not download the file. " + err,
-        });
-        }
+    const tasks = await Task.findAll({
+      raw: true,
+      order: [["id", "ASC"]],
     });
-}
 
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ RESULT TASK] | QUERING " + util.inspect(tasks)
+    );
+
+    const page = req.headers.page || 1;
+    const offset = (page - 1) * tasks.length;
+
+    const j = offset + 1;
+
+    tasks.forEach((task, i) => {
+      let status;
+      switch (task.task_status) {
+        case "In Complete":
+          status = 1;
+          break;
+        case "Overdue":
+          status = 2;
+          break;
+        case "In Progress":
+          status = 3;
+          break;
+        case "Complete":
+          status = 4;
+          break;
+        default:
+          status = 0;
+      }
+
+      task.status = status;
+      task.no = j + i;
+    });
+
+    const response = { total: count, data: tasks };
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ RESULT RESPONSE] | QUERING " +
+        util.inspect(response)
+    );
+
+    result.code = 200;
+    result.status = "success";
+    result.data = response;
+
+    res.json(result);
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+
+    result.code = 500;
+    result.status = "failed";
+    result.data = "Gagal membaca data";
+
+    res.status(500).json(result);
+  }
+};
+
+/**
+ * Mengembalikan total status per user.
+ *
+ * @param {Object} req - Objek permintaan, berisi ID pengguna.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan hasil operasi ke pengguna.
+ * @returns {Promise<void>}
+ */
+const ReadTotalStatusPerUser = async function (req, res) {
+  try {
+    const task = await Task.findAll({
+      group: ["task_status"],
+      attributes: [
+        "task_status",
+        [sequelize.fn("COUNT", sequelize.col("task_status")), "total"],
+      ],
+      where: { userid: req.params.id },
+    });
+
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(task)
+    );
+
+    result.code = 200;
+    result.status = "success";
+    result.data = task;
+
+    res.json(result);
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+
+    result.code = 500;
+    result.status = "failed";
+    result.data = "Gagal membaca data";
+
+    res.status(500).json(result);
+  }
+};
+
+/**
+ * Mengembalikan daftar task berdasarkan status.
+ *
+ * @param {Object} req - Objek permintaan, berisi status task yang diminta.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan hasil operasi ke pengguna.
+ * @returns {Promise<void>}
+ */
+const ReadTaskByStatus = async function (req, res) {
+  try {
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ REQ PARAMS ] | INFO " +
+        util.inspect(req.headers)
+    );
+
+    const count = await Task.count();
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ RESULT COUNT ] | QUERING " +
+        util.inspect(count)
+    );
+
+    await UpdateStatus();
+
+    const status = req.params.status;
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ TASK STATUS ] | QUERING " +
+        util.inspect(status)
+    );
+
+    const tasks = await Task.findAll({
+      raw: true,
+      where: { task_status: status },
+      order: [["id", "ASC"]],
+    });
+
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ RESULT TASK] | QUERING " + util.inspect(tasks)
+    );
+
+    const page = req.headers.page || 1;
+    const offset = (page - 1) * tasks.length;
+
+    const j = offset + 1;
+
+    tasks.forEach((task, i) => {
+      let status;
+      switch (task.task_status) {
+        case "In Complete":
+          status = 1;
+          break;
+        case "Overdue":
+          status = 2;
+          break;
+        case "In Progress":
+          status = 3;
+          break;
+        case "Complete":
+          status = 4;
+          break;
+        default:
+          status = 0;
+      }
+
+      task.status = status;
+      task.no = j + i;
+    });
+
+    const response = { total: count, data: tasks };
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ RESULT RESPONSE] | QUERING " +
+        util.inspect(response)
+    );
+
+    result.code = 200;
+    result.status = "success";
+    result.data = response;
+
+    res.json(result);
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+
+    result.code = 500;
+    result.status = "failed";
+    result.data = "Gagal membaca data";
+
+    res.status(500).json(result);
+  }
+};
+
+/**
+ * Memfilter task berdasarkan kriteria tertentu.
+ *
+ * @param {Object} req - Objek permintaan, berisi ID pengguna dan kriteria filter.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan hasil operasi ke pengguna.
+ * @returns {Promise<void>}
+ */
+const TaskFilter = async function (req, res) {
+  try {
+    const task = await Task.findAll({
+      where: {
+        userid: req.params.id,
+        task_date: new Date(req.body.task_date),
+        task_status: req.body.task_status,
+        task_type: req.body.task_type,
+      },
+    });
+
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(task)
+    );
+
+    result.code = 200;
+    result.status = "success";
+    result.data = task;
+
+    res.json(result);
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+
+    result.code = 500;
+    result.status = "failed";
+    result.data = "Gagal membaca data";
+
+    res.status(500).json(result);
+  }
+};
+
+/**
+ * Mengembalikan daftar task untuk pengguna tertentu.
+ *
+ * @param {Object} req - Objek permintaan, berisi ID pengguna.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan hasil operasi ke pengguna.
+ * @returns {Promise<void>}
+ */
+const ReadTaskUser = async function (req, res) {
+  try {
+    const task = await Task.findAll({
+      where: { userid: req.params.id },
+    });
+
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(task)
+    );
+
+    result.code = 200;
+    result.status = "success";
+    result.data = task;
+
+    res.json(result);
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+
+    result.code = 500;
+    result.status = "failed";
+    result.data = "Gagal membaca data";
+
+    res.status(500).json(result);
+  }
+};
+
+/**
+ * Memperbarui task berdasarkan ID.
+ *
+ * @param {Object} req - Objek permintaan, berisi ID task dan detail pembaruan.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan hasil operasi ke pengguna.
+ * @returns {Promise<void>}
+ */
+const Update = async function (req, res) {
+  try {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      // Update tanpa gambar
+      futil.logger.debug("\n" + futil.shtm() + "- [ UPDATE TANPA IMAGE ]");
+
+      await Task.update(req.body, {
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      result.code = 200;
+      result.status = "success";
+      result.data = "Update data berhasil";
+
+      res.json(result);
+    } else {
+      const sampleFile = req.files.image_task;
+      const uploadPath = path.join(
+        __dirname,
+        "../public/uploads/",
+        sampleFile.name
+      );
+
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ UPLOAD PATH ] | INFO " +
+          util.inspect(uploadPath)
+      );
+
+      await sampleFile.mv(uploadPath);
+
+      req.body.path = uploadPath;
+      req.body.filename = sampleFile.name;
+
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ REQ BODY  ] | INFO " + util.inspect(req.body)
+      );
+
+      await Task.update(req.body, {
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      result.code = 200;
+      result.status = "success";
+      result.data = "Update data berhasil";
+
+      res.json(result);
+    }
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+
+    result.code = 500;
+    result.status = "failed";
+    result.data = "Update data gagal";
+
+    res.status(500).json(result);
+  }
+};
+
+/**
+ * Memperbarui status task berdasarkan tanggal saat ini.
+ *
+ * @returns {Promise<void>}
+ */
+const UpdateStatus = async function () {
+  try {
+    const tasks = await Task.findAll();
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(tasks)
+    );
+
+    const currentDate = futil.currentDate();
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ CURRENT DATE ] | INFO " +
+        util.inspect(currentDate)
+    );
+
+    const date1 = new Date(currentDate);
+
+    for (const task of tasks) {
+      const taskDate = task.task_date;
+      const date2 = new Date(taskDate);
+      const days = futil.dayDiffrence(date1, date2);
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ DAYS ] | INFO " + util.inspect(days)
+      );
+
+      const { user_lat, user_lon, vehicle_lat, vehicle_lon, userid, id } = task;
+
+      if (userid && days > 0 && task.task_status !== "Overdue") {
+        if (!user_lat && !user_lon && !vehicle_lat && !vehicle_lon) {
+          await Task.update({ task_status: "Overdue" }, { where: { id } });
+        } else {
+          await Task.update({ task_status: "Complete" }, { where: { id } });
+        }
+      }
+    }
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+  }
+};
+
+/**
+ * Menghapus task berdasarkan ID.
+ *
+ * @param {Object} req - Objek permintaan, berisi ID task yang akan dihapus.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan hasil operasi ke pengguna.
+ * @returns {Promise<void>}
+ */
+const Delete = async function (req, res) {
+  try {
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ REQUEST PARAM ] | INFO " +
+        util.inspect(req.params)
+    );
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ REQUEST BODY ] | INFO " +
+        util.inspect(req.body)
+    );
+    await Task.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    result.code = 200;
+    result.status = "success";
+    result.data = "Hapus data berhasil";
+
+    res.json(result);
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+
+    result.code = 500;
+    result.status = "failed";
+    result.data = "Hapus data gagal";
+
+    res.status(500).json(result);
+  }
+};
+
+/**
+
+Mengunduh file berdasarkan nama file.
+@param {Object} req - Objek permintaan, berisi nama file yang akan diunduh.
+@param {Object} res - Objek respons yang digunakan untuk mengirimkan hasil operasi ke pengguna.
+@returns {void} */ const Download = function (req, res) {
+  const fileName = req.params.filename;
+  const downloadPath = path.join(__dirname, "../public/uploads/");
+  res.download(downloadPath + fileName, fileName, (err) => {
+    if (err) {
+      res.status(500).send({ message: "Tidak dapat mengunduh file. " + err });
+    }
+  });
+};
 module.exports = {
-    Create,
-    Read,
-    ReadTaskByStatus,
-    ReadTotalStatusPerUser,
-    ReadTaskUser,
-    TaskFilter,
-    Update,
-    Delete,
-    Download
-}
+  Create,
+  Read,
+  ReadTaskByStatus,
+  ReadTotalStatusPerUser,
+  ReadTaskUser,
+  TaskFilter,
+  Update,
+  Delete,
+  Download,
+};

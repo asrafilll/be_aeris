@@ -1,30 +1,41 @@
-const fs = require('fs');
-const path = require('path');
-const Sequelize = require('sequelize');
+import Sequelize from 'sequelize';
+import fs from 'fs';
+import path from 'path';
+import sequelizeInstance from '../config/database';
 
-const db = {};
+const models = {};
 
-require('dotenv').config();
+/**
+ * Membaca dan memuat semua definisi model dari file di direktori saat ini,
+ * kecuali file `index.js`, kemudian menentukan asosiasi antar model.
+ */
 
-let sequelize = new Sequelize(process.env.DATABASE, process.env.DB_USER,process.env.DB_PASSWORD, {
-    host: 'localhost',
-    dialect: 'mysql',
-    logging: false
+// Membaca semua file dalam direktori saat ini, kecuali `index.js`.
+fs.readdirSync(path.resolve(__dirname))
+  .filter(file => file !== 'index.js')
+  .forEach(file => {
+    // Mengimpor definisi model dari setiap file dan inisialisasi model tersebut.
+    const model = import(path.resolve(__dirname, file)).then(m => m.default(sequelizeInstance, Sequelize.DataTypes));
+
+    // Menyimpan model yang diimpor ke dalam objek `models` dengan nama model sebagai kunci.
+    model.then(m => {
+      models[m.name] = m;
+    });
+  });
+
+// Menunggu semua model dimuat sebelum menentukan asosiasi.
+Promise.all(Object.values(models)).then(() => {
+  Object.keys(models).forEach(modelName => {
+    if (models[modelName].associate) {
+      // Menentukan asosiasi (hubungan) antar model jika ada.
+      models[modelName].associate(models);
+    }
+  });
 });
 
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+// Menambahkan instance Sequelize dan Sequelize library ke dalam objek `models`.
+models.sequelizeInstance = sequelizeInstance;
+models.Sequelize = Sequelize;
 
-db.user = require("./user.js")(sequelize, Sequelize);
-// db.task = require("./task.js")(sequelize, Sequelize);
-// db.device = require ("./device.js")(sequelize, Sequelize);
-// db.vehicle = require ("./vehicle.js")(sequelize, Sequelize);
-
-
-// db.user.hasMany(db.task, { as: "users" });
-// db.task.belongsTo(db.user, {
-//   foreignKey: "userid",
-//   as: "users",
-// });
-
-module.exports = db
+// Mengekspor objek `models` untuk digunakan di bagian lain aplikasi.
+export default models;

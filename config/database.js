@@ -1,13 +1,15 @@
-// import sequelize
-var sequelize = require('sequelize');
-require('dotenv').config();
- 
-// create connection
-const db = new sequelize(process.env.DATABASE, process.env.DB_USER,process.env.DB_PASSWORD, {
-    host: 'localhost',
-    dialect: 'mysql',
-    logging: false
+import Sequelize from 'sequelize';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+/**
+ * Inisialisasi koneksi database menggunakan Sequelize.
+ */
+const db = new Sequelize(process.env.DATABASE, process.env.DB_USER, process.env.DB_PASSWORD, {
+  host: 'localhost',
+  dialect: 'mysql',
+  logging: false
 });
- 
-// export connection
-module.exports.db = db
+
+export default db;
