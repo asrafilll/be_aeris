@@ -1,15 +1,16 @@
 import * as jwt from "jsonwebtoken";
 
+import { logger, setEnvValue, shtm } from '../config/utility.js';
+
 import Sequelize from "sequelize";
 import axios from "axios";
 import crypto from "crypto";
+import db from "../models/index.cjs";
 import dotenv from "dotenv";
-import futil from "../config/utility.js";
-import models from "../models";
 import nodemailer from "nodemailer";
 import util from "util";
 
-const User = models.user;
+const User = db.user;
 const Op = Sequelize.Op;
 
 dotenv.config();
@@ -26,8 +27,8 @@ dotenv.config();
 
 const Register = async (req, res) => {
   try {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ REGISTER ] | INFO " + util.inspect(req.body)
+    logger.debug(
+      "\n" + shtm() + "- [ REGISTER ] | INFO " + util.inspect(req.body)
     );
     const user = await User.findAll({
       where: {
@@ -39,8 +40,8 @@ const Register = async (req, res) => {
       raw: true,
     });
 
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(user)
+    logger.debug(
+      "\n" + shtm() + "- [ RESULT ] | QUERING " + util.inspect(user)
     );
 
     if (user.length > 0) {
@@ -50,8 +51,8 @@ const Register = async (req, res) => {
       });
     } else {
       const newUser = await User.create(req.body);
-      futil.logger.debug(
-        "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(newUser)
+      logger.debug(
+        "\n" + shtm() + "- [ RESULT ] | QUERING " + util.inspect(newUser)
       );
 
       res.status(201).json({
@@ -60,8 +61,8 @@ const Register = async (req, res) => {
       });
     }
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
     res.status(500).json({
       status: false,
@@ -83,8 +84,8 @@ const Register = async (req, res) => {
 
 const Login = async (req, res) => {
   try {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ LOGIN ] | INFO " + util.inspect(req.body)
+    logger.debug(
+      "\n" + shtm() + "- [ LOGIN ] | INFO " + util.inspect(req.body)
     );
 
     const user = await User.findOne({
@@ -116,7 +117,7 @@ const Login = async (req, res) => {
     });
 
     const accessToken = response.data.token;
-    futil.setEnvValue("TOKEN_AERTRAK", accessToken);
+    setEnvValue("TOKEN_AERTRAK", accessToken);
 
     res.status(200).json({
       status: true,
@@ -124,8 +125,8 @@ const Login = async (req, res) => {
       token,
     });
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
     res.status(500).json({
       status: false,
@@ -147,9 +148,9 @@ const Login = async (req, res) => {
 
 const ForgotPassword = async (req, res) => {
   try {
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ FORGOT PASSWORD ] | INFO " +
         util.inspect(req.body)
     );
@@ -204,8 +205,8 @@ const ForgotPassword = async (req, res) => {
       message: "Email sent",
     });
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
     res.status(500).json({
       status: false,
@@ -226,9 +227,9 @@ const ForgotPassword = async (req, res) => {
 
 const ChangePassword = async (req, res) => {
   try {
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ CHANGE PASSWORD ] | INFO " +
         util.inspect(req.body)
     );
@@ -262,8 +263,8 @@ const ChangePassword = async (req, res) => {
       message: "Password updated successfully",
     });
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
     res.status(500).json({
       status: false,
@@ -285,21 +286,21 @@ const ChangePassword = async (req, res) => {
 
 const authAccessToken = async (req, res, next) => {
   try {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ HEADERS ] | INFO " + util.inspect(req.headers)
+    logger.debug(
+      "\n" + shtm() + "- [ HEADERS ] | INFO " + util.inspect(req.headers)
     );
     const token = req.headers.token;
 
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ TOKEN ] | INFO " + util.inspect(token)
+    logger.debug(
+      "\n" + shtm() + "- [ TOKEN ] | INFO " + util.inspect(token)
     );
 
     const payload = jwt.verify(token, process.env.TOKEN_SECRET);
     req.user = payload;
     next();
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | AUTH " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | AUTH " + util.inspect(err)
     );
     res.status(401).json({
       status: false,
@@ -309,3 +310,4 @@ const authAccessToken = async (req, res, next) => {
 };
 
 export { ChangePassword, ForgotPassword, Login, Register, authAccessToken };
+

@@ -1,12 +1,8 @@
-const db = require("../models");
-const { Op } = require("sequelize");
-const ModelTask = require("../models/task.js");
-const Task = ModelTask.Task;
-const ModelUser = require("../models/user.js");
-const User = ModelUser.User;
-const path = require("path");
-const util = require("util");
-const futil = require("../config/utility.js");
+import { logger, shtm } from "../config/utility.js";
+
+import Task  from "../models/task.js";
+import path from "path";
+import util from "util";
 
 const result = {
   code: "",
@@ -23,16 +19,16 @@ const result = {
  */
 const Create = async function (req, res) {
   try {
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ REQ PARAMS ] | INFO " +
         util.inspect(req.headers)
     );
     const task = await Task.create(req.body);
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ RESULT TASK CREATE] | QUERING " +
         util.inspect(task)
     );
@@ -43,8 +39,8 @@ const Create = async function (req, res) {
 
     res.status(201).json(result);
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
 
     result.code = 500;
@@ -64,17 +60,17 @@ const Create = async function (req, res) {
  */
 const Read = async function (req, res) {
   try {
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ REQ PARAMS ] | INFO " +
         util.inspect(req.headers)
     );
 
     const count = await Task.count();
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ RESULT COUNT ] | QUERING " +
         util.inspect(count)
     );
@@ -86,8 +82,8 @@ const Read = async function (req, res) {
       order: [["id", "ASC"]],
     });
 
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ RESULT TASK] | QUERING " + util.inspect(tasks)
+    logger.debug(
+      "\n" + shtm() + "- [ RESULT TASK] | QUERING " + util.inspect(tasks)
     );
 
     const page = req.headers.page || 1;
@@ -119,9 +115,9 @@ const Read = async function (req, res) {
     });
 
     const response = { total: count, data: tasks };
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ RESULT RESPONSE] | QUERING " +
         util.inspect(response)
     );
@@ -132,8 +128,8 @@ const Read = async function (req, res) {
 
     res.json(result);
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
 
     result.code = 500;
@@ -162,8 +158,8 @@ const ReadTotalStatusPerUser = async function (req, res) {
       where: { userid: req.params.id },
     });
 
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(task)
+    logger.debug(
+      "\n" + shtm() + "- [ RESULT ] | QUERING " + util.inspect(task)
     );
 
     result.code = 200;
@@ -172,8 +168,8 @@ const ReadTotalStatusPerUser = async function (req, res) {
 
     res.json(result);
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
 
     result.code = 500;
@@ -193,17 +189,17 @@ const ReadTotalStatusPerUser = async function (req, res) {
  */
 const ReadTaskByStatus = async function (req, res) {
   try {
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ REQ PARAMS ] | INFO " +
         util.inspect(req.headers)
     );
 
     const count = await Task.count();
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ RESULT COUNT ] | QUERING " +
         util.inspect(count)
     );
@@ -211,9 +207,9 @@ const ReadTaskByStatus = async function (req, res) {
     await UpdateStatus();
 
     const status = req.params.status;
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ TASK STATUS ] | QUERING " +
         util.inspect(status)
     );
@@ -224,8 +220,8 @@ const ReadTaskByStatus = async function (req, res) {
       order: [["id", "ASC"]],
     });
 
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ RESULT TASK] | QUERING " + util.inspect(tasks)
+    logger.debug(
+      "\n" + shtm() + "- [ RESULT TASK] | QUERING " + util.inspect(tasks)
     );
 
     const page = req.headers.page || 1;
@@ -257,9 +253,9 @@ const ReadTaskByStatus = async function (req, res) {
     });
 
     const response = { total: count, data: tasks };
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ RESULT RESPONSE] | QUERING " +
         util.inspect(response)
     );
@@ -270,8 +266,8 @@ const ReadTaskByStatus = async function (req, res) {
 
     res.json(result);
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
 
     result.code = 500;
@@ -300,8 +296,8 @@ const TaskFilter = async function (req, res) {
       },
     });
 
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(task)
+    logger.debug(
+      "\n" + shtm() + "- [ RESULT ] | QUERING " + util.inspect(task)
     );
 
     result.code = 200;
@@ -310,8 +306,8 @@ const TaskFilter = async function (req, res) {
 
     res.json(result);
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
 
     result.code = 500;
@@ -335,8 +331,8 @@ const ReadTaskUser = async function (req, res) {
       where: { userid: req.params.id },
     });
 
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(task)
+    logger.debug(
+      "\n" + shtm() + "- [ RESULT ] | QUERING " + util.inspect(task)
     );
 
     result.code = 200;
@@ -345,8 +341,8 @@ const ReadTaskUser = async function (req, res) {
 
     res.json(result);
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
 
     result.code = 500;
@@ -368,7 +364,7 @@ const Update = async function (req, res) {
   try {
     if (!req.files || Object.keys(req.files).length === 0) {
       // Update tanpa gambar
-      futil.logger.debug("\n" + futil.shtm() + "- [ UPDATE TANPA IMAGE ]");
+      logger.debug("\n" + shtm() + "- [ UPDATE TANPA IMAGE ]");
 
       await Task.update(req.body, {
         where: {
@@ -389,9 +385,9 @@ const Update = async function (req, res) {
         sampleFile.name
       );
 
-      futil.logger.debug(
+      logger.debug(
         "\n" +
-          futil.shtm() +
+          shtm() +
           "- [ UPLOAD PATH ] | INFO " +
           util.inspect(uploadPath)
       );
@@ -401,8 +397,8 @@ const Update = async function (req, res) {
       req.body.path = uploadPath;
       req.body.filename = sampleFile.name;
 
-      futil.logger.debug(
-        "\n" + futil.shtm() + "- [ REQ BODY  ] | INFO " + util.inspect(req.body)
+      logger.debug(
+        "\n" + shtm() + "- [ REQ BODY  ] | INFO " + util.inspect(req.body)
       );
 
       await Task.update(req.body, {
@@ -418,8 +414,8 @@ const Update = async function (req, res) {
       res.json(result);
     }
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
 
     result.code = 500;
@@ -438,14 +434,14 @@ const Update = async function (req, res) {
 const UpdateStatus = async function () {
   try {
     const tasks = await Task.findAll();
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ RESULT ] | QUERING " + util.inspect(tasks)
+    logger.debug(
+      "\n" + shtm() + "- [ RESULT ] | QUERING " + util.inspect(tasks)
     );
 
-    const currentDate = futil.currentDate();
-    futil.logger.debug(
+    const currentDate = currentDate();
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ CURRENT DATE ] | INFO " +
         util.inspect(currentDate)
     );
@@ -455,9 +451,9 @@ const UpdateStatus = async function () {
     for (const task of tasks) {
       const taskDate = task.task_date;
       const date2 = new Date(taskDate);
-      const days = futil.dayDiffrence(date1, date2);
-      futil.logger.debug(
-        "\n" + futil.shtm() + "- [ DAYS ] | INFO " + util.inspect(days)
+      const days = dayDiffrence(date1, date2);
+      logger.debug(
+        "\n" + shtm() + "- [ DAYS ] | INFO " + util.inspect(days)
       );
 
       const { user_lat, user_lon, vehicle_lat, vehicle_lon, userid, id } = task;
@@ -471,8 +467,8 @@ const UpdateStatus = async function () {
       }
     }
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
   }
 };
@@ -486,15 +482,15 @@ const UpdateStatus = async function () {
  */
 const Delete = async function (req, res) {
   try {
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ REQUEST PARAM ] | INFO " +
         util.inspect(req.params)
     );
-    futil.logger.debug(
+    logger.debug(
       "\n" +
-        futil.shtm() +
+        shtm() +
         "- [ REQUEST BODY ] | INFO " +
         util.inspect(req.body)
     );
@@ -510,8 +506,8 @@ const Delete = async function (req, res) {
 
     res.json(result);
   } catch (err) {
-    futil.logger.debug(
-      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
     );
 
     result.code = 500;
@@ -536,14 +532,10 @@ Mengunduh file berdasarkan nama file.
     }
   });
 };
-module.exports = {
-  Create,
-  Read,
-  ReadTaskByStatus,
-  ReadTotalStatusPerUser,
-  ReadTaskUser,
-  TaskFilter,
-  Update,
-  Delete,
-  Download,
+export {
+    Create, Delete,
+    Download, Read,
+    ReadTaskByStatus, ReadTaskUser, ReadTotalStatusPerUser, TaskFilter,
+    Update
 };
+

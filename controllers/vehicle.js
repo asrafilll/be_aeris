@@ -1,6 +1,6 @@
 import { logger, shtm } from '../config/utility.js';
 
-import { Vehicle } from '../models/vehicle.js';
+import Vehicle  from '../models/vehicle.js';
 import { inspect } from 'util';
 
 /**

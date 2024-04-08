@@ -54,5 +54,5 @@ const Vehicle = db.define('vehicles', {
 });
 
 // Mengekspor model Vehicle agar dapat digunakan di bagian lain aplikasi
-export { Vehicle };
+export default Vehicle ;
 

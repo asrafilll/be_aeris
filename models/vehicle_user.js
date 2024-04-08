@@ -28,4 +28,4 @@ const Vehicle_User = db.define('vehicle_users', {
 });
 
 // Mengekspor model Vehicle_User agar dapat digunakan di bagian lain aplikasi
-export { Vehicle_User };
+export  default Vehicle_User;

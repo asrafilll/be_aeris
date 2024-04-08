@@ -1,6 +1,7 @@
+import { logger, shtm } from '../config/utility.js';
+
 import axios from 'axios';
 import { config } from 'dotenv';
-import futil from '../config/utility.js';
 import util from 'util';
 
 config(); // Mengaktifkan dotenv untuk mengelola variabel lingkungan
@@ -14,8 +15,8 @@ const AssetByID = async (req, res) => {
   const accessToken = process.env.TOKEN_AERTRAK;
   const urlAssets = `${process.env.URL_ASSET_AERTRACK}/${req.params.sclId}`;
 
-  futil.logger.debug(`${futil.shtm()} - [ ASSETS ] | INFO ${util.inspect('ASSETS')}`);
-  futil.logger.debug(`${futil.shtm()} - [ URL ASSETS ] | INFO ${util.inspect(urlAssets)}`);
+  logger.debug(`${shtm()} - [ ASSETS ] | INFO ${util.inspect('ASSETS')}`);
+  logger.debug(`${shtm()} - [ URL ASSETS ] | INFO ${util.inspect(urlAssets)}`);
 
   try {
     const config = {
@@ -24,7 +25,7 @@ const AssetByID = async (req, res) => {
       }
     };
     const responseAssets = await axios.get(urlAssets, config);
-    futil.logger.debug(`${futil.shtm()} - [ RESPONSE BODY] | INFO ${util.inspect(responseAssets.data)}`);
+    logger.debug(`${shtm()} - [ RESPONSE BODY] | INFO ${util.inspect(responseAssets.data)}`);
 
     const result = {
       status: true,
@@ -47,13 +48,13 @@ const AssetByID = async (req, res) => {
  */
 const handleAxiosError = (error, res) => {
   if (error.response) {
-    futil.logger.debug(`${futil.shtm()} - [ ERROR RESPONSE DATA ]  ${util.inspect(error.response.data)}`);
-    futil.logger.debug(`${futil.shtm()} - [ ERROR RESPONSE STATUS ]  ${util.inspect(error.response.status)}`);
-    futil.logger.debug(`${futil.shtm()} - [ ERROR RESPONSE HEADER ]  ${util.inspect(error.response.headers)}`);
+    logger.debug(`${shtm()} - [ ERROR RESPONSE DATA ]  ${util.inspect(error.response.data)}`);
+    logger.debug(`${shtm()} - [ ERROR RESPONSE STATUS ]  ${util.inspect(error.response.status)}`);
+    logger.debug(`${shtm()} - [ ERROR RESPONSE HEADER ]  ${util.inspect(error.response.headers)}`);
   } else if (error.request) {
-    futil.logger.debug(`${futil.shtm()} - [ ERROR REQUEST ]  ${util.inspect(error.request)}`);
+    logger.debug(`${shtm()} - [ ERROR REQUEST ]  ${util.inspect(error.request)}`);
   } else {
-    futil.logger.debug(`${futil.shtm()} - [ ERROR ]  ${util.inspect(error.message)}`);
+    logger.debug(`${shtm()} - [ ERROR ]  ${util.inspect(error.message)}`);
   }
 
   const result = {
@@ -81,8 +82,8 @@ const AllAssets1 = async (req, res) => {
   const accessToken = process.env.TOKEN_AERTRAK;
   const urlAssets = process.env.URL_ASSET_AERTRACK;
 
-  futil.logger.debug(`${futil.shtm()} - [ ASET ] | INFO ${util.inspect('ASET')}`);
-  futil.logger.debug(`${futil.shtm()} - [ URL ASET ] | INFO ${util.inspect(urlAssets)}`);
+  logger.debug(`${shtm()} - [ ASET ] | INFO ${util.inspect('ASET')}`);
+  logger.debug(`${shtm()} - [ URL ASET ] | INFO ${util.inspect(urlAssets)}`);
 
   try {
     const responseAssets = await axios.get(urlAssets, {
@@ -90,7 +91,7 @@ const AllAssets1 = async (req, res) => {
         token: accessToken,
       },
     });
-    futil.logger.debug(`${futil.shtm()} - [ ISI RESPON] | INFO ${util.inspect(responseAssets.data)}`);
+    logger.debug(`${shtm()} - [ ISI RESPON] | INFO ${util.inspect(responseAssets.data)}`);
 
     // Logika untuk menghitung status aset
 
@@ -117,8 +118,8 @@ const LatestStatus = async (req, res) => {
   const sclId = req.params.sclId;
   const urlLatestStatus = `${process.env.URL_LATEST_STATUS_AERTRACK}accountId=${accountId}&includeHierarchy=false&sclId=${sclId}`;
 
-  futil.logger.debug(`${futil.shtm()} - [ STATUS ASET TERBARU ] | INFO `);
-  futil.logger.debug(`${futil.shtm()} - [ URL STATUS ASET TERBARU ] | INFO ${util.inspect(urlLatestStatus)}`);
+  logger.debug(`${shtm()} - [ STATUS ASET TERBARU ] | INFO `);
+  logger.debug(`${shtm()} - [ URL STATUS ASET TERBARU ] | INFO ${util.inspect(urlLatestStatus)}`);
 
   try {
     const responseLatestStatus = await axios.get(urlLatestStatus, {
@@ -126,7 +127,7 @@ const LatestStatus = async (req, res) => {
         token: accessToken,
       },
     });
-    futil.logger.debug(`${futil.shtm()} - [ ISI RESPON] | INFO ${util.inspect(responseLatestStatus.data)}`);
+    logger.debug(`${shtm()} - [ ISI RESPON] | INFO ${util.inspect(responseLatestStatus.data)}`);
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
@@ -151,8 +152,8 @@ const LatestStatus1 = async (req, res) => {
   const accountId = process.env.ACCOUNTID;
   const urlLatestStatus = `${process.env.URL_LATEST_STATUS_AERTRACK}accountId=${accountId}&includeHierarchy=false`;
 
-  futil.logger.debug(`${futil.shtm()} - [ STATUS TERBARU ASET ] | INFO`);
-  futil.logger.debug(`${futil.shtm()} - [ URL STATUS TERBARU ASET ] | INFO ${util.inspect(urlLatestStatus)}`);
+  logger.debug(`${shtm()} - [ STATUS TERBARU ASET ] | INFO`);
+  logger.debug(`${shtm()} - [ URL STATUS TERBARU ASET ] | INFO ${util.inspect(urlLatestStatus)}`);
 
   try {
     const response = await axios.get(urlLatestStatus, {
@@ -160,7 +161,7 @@ const LatestStatus1 = async (req, res) => {
         token: accessToken,
       },
     });
-    futil.logger.debug(`${futil.shtm()} - [ ISI RESPON ] | INFO ${util.inspect(response.data)}`);
+    logger.debug(`${shtm()} - [ ISI RESPON ] | INFO ${util.inspect(response.data)}`);
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
@@ -188,7 +189,7 @@ const AssetAddress = async (req, res) => {
 
   try {
     const response = await axios.get(url);
-    futil.logger.debug(`${futil.shtm()} - [ ISI RESPON] | INFO ${util.inspect(response)}`);
+    logger.debug(`${shtm()} - [ ISI RESPON] | INFO ${util.inspect(response)}`);
 
     const validAddress = response.data.results[0].formatted_address;
 
@@ -200,7 +201,7 @@ const AssetAddress = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    futil.logger.debug(`${futil.shtm()} - [ KESALAHAN ] | INFO ${util.inspect(error)}`);
+    logger.debug(`${shtm()} - [ KESALAHAN ] | INFO ${util.inspect(error)}`);
 
     res.setHeader("Content-Type", "application/json");
     res.status(400).json({
@@ -224,8 +225,8 @@ const History = async (req, res) => {
   const accountId = process.env.ACCOUNTID;
   const urlHistory = `${process.env.URL_ASSET_HISTORY}${sclId}/data?createdBefore=${createdBefore}&createdAfter=${createdAfter}&accountId=${accountId}`;
 
-  futil.logger.debug(`${futil.shtm()} - [ RIWAYAT ASET ] | INFO`);
-  futil.logger.debug(`${futil.shtm()} - [ URL RIWAYAT ASET ] | INFO ${util.inspect(urlHistory)}`);
+  logger.debug(`${shtm()} - [ RIWAYAT ASET ] | INFO`);
+  logger.debug(`${shtm()} - [ URL RIWAYAT ASET ] | INFO ${util.inspect(urlHistory)}`);
 
   try {
     const responseAssets = await axios.get(urlHistory, {
@@ -233,7 +234,7 @@ const History = async (req, res) => {
         token: token,
       },
     });
-    futil.logger.debug(`${futil.shtm()} - [ ISI RESPON ] | INFO ${util.inspect(responseAssets.data)}`);
+    logger.debug(`${shtm()} - [ ISI RESPON ] | INFO ${util.inspect(responseAssets.data)}`);
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
@@ -256,8 +257,8 @@ const StatusCount = async (req, res) => {
   const urlStatusCount = process.env.URL_STATUS_COUNT_AERTRACK;
   const token = process.env.TOKEN_AERTRAK;
 
-  futil.logger.debug(`${futil.shtm()} - [ JUMLAH STATUS ASET ] | INFO`);
-  futil.logger.debug(`${futil.shtm()} - [ URL JUMLAH STATUS ASET ] | INFO ${util.inspect(urlStatusCount)}`);
+  logger.debug(`${shtm()} - [ JUMLAH STATUS ASET ] | INFO`);
+  logger.debug(`${shtm()} - [ URL JUMLAH STATUS ASET ] | INFO ${util.inspect(urlStatusCount)}`);
 
   try {
     const responseAssets = await axios.get(urlStatusCount, {
@@ -265,7 +266,7 @@ const StatusCount = async (req, res) => {
         token: token,
       },
     });
-    futil.logger.debug(`${futil.shtm()} - [ ISI RESPON ] | INFO ${util.inspect(responseAssets.data)}`);
+    logger.debug(`${shtm()} - [ ISI RESPON ] | INFO ${util.inspect(responseAssets.data)}`);
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({
@@ -280,11 +281,9 @@ const StatusCount = async (req, res) => {
 
 
 export {
-  AssetByID,
   AllAssets1,
-  AssetAddress,
-  LatestStatus,
+  AssetAddress, AssetByID, History, LatestStatus,
   LatestStatus1,
-  StatusCount,
-  History
+  StatusCount
 };
+

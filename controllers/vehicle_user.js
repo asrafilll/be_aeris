@@ -1,7 +1,7 @@
-const Model = require('../models/vehicle_user.js');
-const Vehicle_User = Model.Vehicle_User;
-const util = require('util');
-const futil = require('../config/utility.js');
+import { logger, shtm } from "../config/utility.js";
+
+import  Vehicle_Use from "../models/vehicle_user.js";
+import util from "util";
 
 /**
  * Membuat data vehicle user baru.
@@ -15,18 +15,20 @@ const futil = require('../config/utility.js');
 const createVehicleUser = async (req, res) => {
   try {
     const vehicleUser = await Vehicle_User.create(req.body);
-    futil.logger.debug(`\n${futil.shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUser)}`);
+    logger.debug(
+      `\n${shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUser)}`
+    );
     res.status(201).json({
       code: 201,
-      status: 'success',
-      data: 'Vehicle user created successfully',
+      status: "success",
+      data: "Vehicle user created successfully",
     });
   } catch (err) {
-    futil.logger.debug(`\n${futil.shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
+    logger.debug(`\n${shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
     res.status(500).json({
       code: 500,
-      status: 'failed',
-      data: 'Failed to create vehicle user',
+      status: "failed",
+      data: "Failed to create vehicle user",
     });
   }
 };
@@ -43,18 +45,20 @@ const createVehicleUser = async (req, res) => {
 const getAllVehicleUsers = async (req, res) => {
   try {
     const vehicleUsers = await Vehicle_User.findAll();
-    futil.logger.debug(`\n${futil.shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUsers)}`);
+    logger.debug(
+      `\n${shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUsers)}`
+    );
     res.status(200).json({
       code: 200,
-      status: 'success',
+      status: "success",
       data: vehicleUsers,
     });
   } catch (err) {
-    futil.logger.debug(`\n${futil.shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
+    logger.debug(`\n${shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
     res.status(500).json({
       code: 500,
-      status: 'failed',
-      data: 'Failed to retrieve vehicle user data',
+      status: "failed",
+      data: "Failed to retrieve vehicle user data",
     });
   }
 };
@@ -79,22 +83,24 @@ const getVehicleUserByVehicleId = async (req, res) => {
     if (vehicleUser.length === 0) {
       return res.status(404).json({
         code: 404,
-        status: 'failed',
-        data: 'Vehicle user not found',
+        status: "failed",
+        data: "Vehicle user not found",
       });
     }
-    futil.logger.debug(`\n${futil.shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUser)}`);
+    logger.debug(
+      `\n${shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUser)}`
+    );
     res.status(200).json({
       code: 200,
-      status: 'success',
+      status: "success",
       data: vehicleUser,
     });
   } catch (err) {
-    futil.logger.debug(`\n${futil.shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
+    logger.debug(`\n${shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
     res.status(500).json({
       code: 500,
-      status: 'failed',
-      data: 'Failed to retrieve vehicle user data',
+      status: "failed",
+      data: "Failed to retrieve vehicle user data",
     });
   }
 };
@@ -115,27 +121,29 @@ const getLatestVehicleUserByVehicleId = async (req, res) => {
       where: {
         vehicleid: req.params.vehicleid,
       },
-      order: [['createdAt', 'DESC']],
+      order: [["createdAt", "DESC"]],
     });
     if (!vehicleUser) {
       return res.status(404).json({
         code: 404,
-        status: 'failed',
-        data: 'Vehicle user not found',
+        status: "failed",
+        data: "Vehicle user not found",
       });
     }
-    futil.logger.debug(`\n${futil.shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUser)}`);
+    logger.debug(
+      `\n${shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUser)}`
+    );
     res.status(200).json({
       code: 200,
-      status: 'success',
+      status: "success",
       data: vehicleUser,
     });
   } catch (err) {
-    futil.logger.debug(`\n${futil.shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
+    logger.debug(`\n${shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
     res.status(500).json({
       code: 500,
-      status: 'failed',
-      data: 'Failed to retrieve vehicle user data',
+      status: "failed",
+      data: "Failed to retrieve vehicle user data",
     });
   }
 };
@@ -156,27 +164,29 @@ const getLatestVehicleUserByUserId = async (req, res) => {
       where: {
         userid: req.params.userid,
       },
-      order: [['createdAt', 'DESC']],
+      order: [["createdAt", "DESC"]],
     });
     if (!vehicleUser) {
       return res.status(404).json({
         code: 404,
-        status: 'failed',
-        data: 'Vehicle user not found',
+        status: "failed",
+        data: "Vehicle user not found",
       });
     }
-    futil.logger.debug(`\n${futil.shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUser)}`);
+    logger.debug(
+      `\n${shtm()}- [ RESULT ] | QUERYING ${util.inspect(vehicleUser)}`
+    );
     res.status(200).json({
       code: 200,
-      status: 'success',
+      status: "success",
       data: vehicleUser,
     });
   } catch (err) {
-    futil.logger.debug(`\n${futil.shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
+    logger.debug(`\n${shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
     res.status(500).json({
       code: 500,
-      status: 'failed',
-      data: 'Failed to retrieve vehicle user data',
+      status: "failed",
+      data: "Failed to retrieve vehicle user data",
     });
   }
 };
@@ -199,15 +209,15 @@ const updateVehicleUser = async (req, res) => {
     });
     res.status(200).json({
       code: 200,
-      status: 'success',
-      data: 'Vehicle user updated successfully',
+      status: "success",
+      data: "Vehicle user updated successfully",
     });
   } catch (err) {
-    futil.logger.debug(`\n${futil.shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
+    logger.debug(`\n${shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
     res.status(500).json({
       code: 500,
-      status: 'failed',
-      data: 'Failed to update vehicle user data',
+      status: "failed",
+      data: "Failed to update vehicle user data",
     });
   }
 };
@@ -230,25 +240,25 @@ const deleteVehicleUser = async (req, res) => {
     });
     res.status(200).json({
       code: 200,
-      status: 'success',
-      data: 'Vehicle user deleted successfully',
+      status: "success",
+      data: "Vehicle user deleted successfully",
     });
   } catch (err) {
-    futil.logger.debug(`\n${futil.shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
+    logger.debug(`\n${shtm()}- [ ERROR ] | QUERYING ${util.inspect(err)}`);
     res.status(500).json({
       code: 500,
-      status: 'failed',
-      data: 'Failed to delete vehicle user data',
+      status: "failed",
+      data: "Failed to delete vehicle user data",
     });
   }
 };
 
-module.exports = {
+export {
   createVehicleUser,
-  getAllVehicleUsers,
-  getVehicleUserByVehicleId,
-  getLatestVehicleUserByVehicleId,
-  getLatestVehicleUserByUserId,
-  updateVehicleUser,
   deleteVehicleUser,
+  getAllVehicleUsers,
+  getLatestVehicleUserByUserId,
+  getLatestVehicleUserByVehicleId,
+  getVehicleUserByVehicleId,
+  updateVehicleUser,
 };

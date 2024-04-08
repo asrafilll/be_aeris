@@ -1,11 +1,14 @@
+import { logger, shtm } from './config/utility.js';
+
 import bodyParser from 'body-parser';
-import con from './config/database.js';
 import cors from 'cors';
+import db from './config/database.js';
 import dotenv from 'dotenv';
 import express from 'express';
 import fileUpload from 'express-fileupload';
-import futil from './config/utility.js';
-import routes from './routes/index.js';
+import { router } from './routes/index.js';
+import swaggerSpec from './swagger.js';
+import swaggerUi from 'swagger-ui-express';
 import util from 'util';
 
 dotenv.config();
@@ -27,23 +30,38 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(fileUpload());
-app.use(routes.router);
+app.use(router);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 /**
  * Mendengarkan port yang ditentukan di variabel lingkungan.
  * Menampilkan informasi startup server dan mencoba menghubungkan ke database.
  */
-const server = app.listen(process.env.SERVER_PORT, () => {
-    const port = server.address().port;
+// ...
 
-    futil.logger.debug('\n' + futil.shtm() + '- [ W A K E   U P ] | STARTING ' + util.inspect(process.env.TITLE));
-    futil.logger.debug(futil.shtm() + '- [ W A K E   U P ] | RUN AT PATH: /api/pattern, PORT: ' + port);
-
+/** 
+ * Mendengarkan port yang ditentukan di variabel lingkungan.
+ * Menampilkan informasi startup server dan mencoba menghubungkan ke database.
+ */
+const startServer = async () => {
+    const server = app.listen(4321, () => {
+      const port = server.address().port;
+      console.log(port);
+      logger.debug('\n' + shtm() + '- [ W A K E U P ] | STARTING ' + util.inspect(process.env.TITLE));
+      logger.debug(shtm() + '- [ W A K E U P ] | RUN AT PATH: /api/pattern, PORT: ' + port);
+    });
+  
     // Menguji koneksi database
     try {
-        con.db.authenticate();
-        futil.logger.debug('\n' + futil.shtm() + '- [ DATABASE U P ] | STARTING ' + util.inspect(process.env.DATABASE));
+      await db.authenticate();
+      logger.debug('\n' + shtm() + '- [ DATABASE U P ] | STARTING ' + util.inspect(process.env.DATABASE));
     } catch (error) {
-        futil.logger.debug('\n' + futil.shtm() + '- [ DATABASE ERROR] | STARTING ' + util.inspect(error));
+      console.error('Database connection error:');
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack trace:', error.stack);
+      logger.debug('\n' + shtm() + '- [ DATABASE ERROR] | STARTING ' + util.inspect(error));
     }
-});
+  };
+  
+  startServer();

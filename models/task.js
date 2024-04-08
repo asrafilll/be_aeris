@@ -72,4 +72,4 @@ Task.associate = (models) => {
   });
 };
 
-export { Task };
+export default Task;

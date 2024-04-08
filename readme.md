@@ -1,5 +1,25 @@
 # Catatan BE
 
+# Table of Contents
+
+- [Catatan BE](#catatan-be)
+- [Table of Contents](#table-of-contents)
+  - [Instalasi Error](#instalasi-error)
+  - [Solusinya....](#solusinya)
+    - [1. Buat Dulu Databasenya](#1-buat-dulu-databasenya)
+    - [2. Coba Lagi Proses Impornya](#2-coba-lagi-proses-impornya)
+  - [Setup Sequelize-cli](#setup-sequelize-cli)
+  - [Bug-Jos-mantap](#bug-jos-mantap)
+    - [1. Penggunaan `require()` pada ES Module](#1-penggunaan-require-pada-es-module)
+      - [Masalah:](#masalah)
+      - [Solusi dari GPT:](#solusi-dari-gpt)
+    - [2. Scheme URL Tidak Didukung pada Import ESM](#2-scheme-url-tidak-didukung-pada-import-esm)
+      - [Masalah:](#masalah-1)
+      - [Solusi dari GPT:](#solusi-dari-gpt-1)
+  - [Bisnis Flow:](#bisnis-flow)
+
+
+
 ## Instalasi Error
 
 Ketemu eror kayak gini wuakakakak
@@ -81,6 +101,31 @@ Kalau semuanya udah beres, tinggal gas aja pake perintah ini:
 ```
 npx sequelize-cli db:migrate
 ```
+
+
+## Bug-Jos-mantap
+
+### 1. Penggunaan `require()` pada ES Module
+
+#### Masalah:
+Ketika mencoba menggunakan `require()` untuk mengimpor modul yang ditulis sebagai ES Module (ESM), Node.js mengembalikan error `ERR_REQUIRE_ESM`. Hal ini terjadi karena `require()` adalah sintaks CommonJS, sedangkan modul tersebut adalah ESM.
+
+#### Solusi dari GPT:
+Ubah cara mengimpor modul dari `require()` menjadi `import`. Misalnya, jika error terjadi saat mengimpor `task.js`:
+- Sebelum: `const task = require('./models/task.js');`
+- Sesudah: Ganti dengan dynamic import: `import task from './models/task.js';`
+
+Catatan: `import()` bersifat asinkron, sehingga mungkin perlu menyesuaikan kode lebih lanjut untuk menangani ini.
+
+### 2. Scheme URL Tidak Didukung pada Import ESM
+
+#### Masalah:
+Ketika melakukan import ESM dengan path yang tidak sesuai skema yang didukung (`file:`, `data:`, `node:`), Node.js mengembalikan error `ERR_UNSUPPORTED_ESM_URL_SCHEME`. Terutama pada Windows, path absolut harus diubah menjadi URL yang valid dengan skema `file://`.
+
+#### Solusi dari GPT: 
+Pastikan bahwa saat menggunakan `import` dengan path absolut, konversi path tersebut menjadi format URL yang valid dengan menambahkan `file://` di awal path. Ini umumnya berlaku untuk penggunaan `import()` dinamis dengan string sebagai path.
+
+Misalnya, ubah path `E:\\be_aeris\\models\\task.js` menjadi format URL yang valid: `file:///E:/be_aeris/models/task.js` untuk penggunaan dalam dynamic import.
 
 ## Bisnis Flow:
 1. User Management:
