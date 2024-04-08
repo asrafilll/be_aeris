@@ -1,5 +1,3 @@
-// Mengimpor Sequelize dan koneksi database menggunakan sintaks ES6
-
 import { DataTypes } from 'sequelize';
 import db from '../config/database.js';
 

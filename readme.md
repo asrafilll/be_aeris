@@ -1,5 +1,87 @@
 # Catatan BE
 
+## Instalasi Error
+
+Ketemu eror kayak gini wuakakakak
+
+```
+ERROR 1049 (42000): Unknown database 'polisi'
+```
+
+## Solusinya....
+
+### 1. Buat Dulu Databasenya
+
+Sebelum impor file `.sql`, pastikan database `polisi` udah dibuat ya. Bisa kok bikin database lewat MySQL command line interface (CLI), gini caranya:
+
+1. Buka MySQL CLI:
+   - Dari PowerShell atau Command Prompt, ketik aja:
+     ```powershell
+     mysql -u root -p
+     ```
+   - Terus masukin password kamu.
+
+2. Buat Database:
+   - Di MySQL CLI, ketik perintah ini buat bikin database baru:
+     ```sql
+     CREATE DATABASE polisi;
+     ```
+   - Keluar dari MySQL CLI tinggal ketik `exit` atau `quit` terus pencet `Enter` deh.
+
+### 2. Coba Lagi Proses Impornya
+
+Habis database `polisi` berhasil dibuat, coba lagi proses impor pake PowerShell kayak tadi:
+
+Karena saya Sobat Windows jadi kek gini
+```powershell
+Get-Content .\db_fleet.sql | mysql -u root -p polisi
+```
+
+kalo saudara adalah sobat unix, jadi pake ini aja deh
+```
+mysql -u root -p polisi < .\db_fleet.sql
+```
+
+Jangan lupa masukin password ya. Harusnya sekarang proses impor lancar jaya
+
+## Setup Sequelize-cli
+
+Pertama, install dulu `sequelize-cli` pake perintah ini:
+
+```
+npm install --save-dev sequelize-cli
+```
+
+Habis itu, tinggal jalanin:
+
+```
+npx sequelize-cli init
+```
+
+Nanti bakal muncul beberapa folder. Kita fokus ke folder `config` aja, terus isi file `config.json` dengan nama db, merk db, sama password kamu.
+
+Karena di DB ada 9 tabel, kita bikin 9 migrasi per tabelnya pake perintah ini:
+
+```
+npx sequelize-cli migration:generate --name create-user
+npx sequelize-cli migration:generate --name create-vehicle
+npx sequelize-cli migration:generate --name create-vehicle-user
+npx sequelize-cli migration:generate --name create-place-in
+npx sequelize-cli migration:generate --name create-place-out
+npx sequelize-cli migration:generate --name create-task
+npx sequelize-cli migration:generate --name create-vehicle-perawatan
+npx sequelize-cli migration:generate --name create-sent-wa
+npx sequelize-cli migration:generate --name create-webhook-wa
+```
+
+Setelah folder-foldernya kebuat, tugas kita adalah nulis ulang schema yang udah dipikirin pas bikin database sebelumnya. Jangan lupa tulis tipe data, validasi, sama relasinya kayak contoh di folder `models`.
+
+Kalau semuanya udah beres, tinggal gas aja pake perintah ini:
+
+```
+npx sequelize-cli db:migrate
+```
+
 ## Bisnis Flow:
 1. User Management:
    - Aplikasi ini memiliki sistem manajemen user dengan tabel "users".
@@ -31,8 +113,8 @@
 UML (Class Diagram):
 
 
+![Diagram Database Merch Store](https://www.plantuml.com/plantuml/png/hPNFRjim3CRlVWejfwr03XtGIq_T3WE27HPWwteq68krjUYF8T49YgBlFjaLuYuXVHXwAGB-HFAZzOczImIH1cUh3zIXGmNEj50r5b9IzmcZUgwKMYkZRvNnf9wttr-cm92P1uUtwW2nwI1-_7npysb2VSuzXgWPPF60balfQZ-u7SOth22829THT62uGar48DHVduhSRrdkIrNc-OsTQInA8nrUiU645rRl8lWbJayzBk0cU6t81C-S4RxcmN27hMdG9wnx2yHbQJpa4njEQX-E6Ej4G4DYi6cz35EFoDKCFKOWuzkQp3Y51iBnrmG9sZOZ9WrIokqSUfgkGhp1gRLnx3Z66wg33Wu9uvHpSU6YZ-LBBtsBqOq-5zFOyuovwzP2WnilTJG-sq0lkEHU5jEFfTcFKEl926GS9WBNdydvCP2a9mpqle9AKLdHBqXxIGrbnjGRmwNW-7UEvVAboHm3hIEc99MnG28ANaBbJV2KU_UyUKgG5r4GAsBPgFC1eNAXGd6DgM4tENLC-D5O5BPLn6Q84JtzvsxUOeGZ48Yl9_S5URpDab6f_8_XzXhv_RorJg6wnzY3_mE-FQDbuN2r12lim4iBuoTwUlWYJPmohIam9Hsc12tNBEVeqtCfia_j7d3NXR2NEpx6uEHsl26OyFpq_rKnhUFLzKgjrsfrjPhMmKMm-A6goW-6ZIaSBlkNHMKNpkpgbLqN6MAtsPbLDPvycpa9kKEl1sV_0W00)
 
-![UML Database](www.plantuml.com/plantuml/png/hPNFRjim3CRlVWejfwr03XtGIq_T3WE27HPWwteq68krjUYF8T49YgBlFjaLuYuXVHXwAGB-HFAZzOczImIH1cUh3zIXGmNEj50r5b9IzmcZUgwKMYkZRvNnf9wttr-cm92P1uUtwW2nwI1-_7npysb2VSuzXgWPPF60balfQZ-u7SOth22829THT62uGar48DHVduhSRrdkIrNc-OsTQInA8nrUiU645rRl8lWbJayzBk0cU6t81C-S4RxcmN27hMdG9wnx2yHbQJpa4njEQX-E6Ej4G4DYi6cz35EFoDKCFKOWuzkQp3Y51iBnrmG9sZOZ9WrIokqSUfgkGhp1gRLnx3Z66wg33Wu9uvHpSU6YZ-LBBtsBqOq-5zFOyuovwzP2WnilTJG-sq0lkEHU5jEFfTcFKEl926GS9WBNdydvCP2a9mpqle9AKLdHBqXxIGrbnjGRmwNW-7UEvVAboHm3hIEc99MnG28ANaBbJV2KU_UyUKgG5r4GAsBPgFC1eNAXGd6DgM4tENLC-D5O5BPLn6Q84JtzvsxUOeGZ48Yl9_S5URpDab6f_8_XzXhv_RorJg6wnzY3_mE-FQDbuN2r12lim4iBuoTwUlWYJPmohIam9Hsc12tNBEVeqtCfia_j7d3NXR2NEpx6uEHsl26OyFpq_rKnhUFLzKgjrsfrjPhMmKMm-A6goW-6ZIaSBlkNHMKNpkpgbLqN6MAtsPbLDPvycpa9kKEl1sV_0W00)
 
 Penjelasan hubungan antar tabel:
 - Tabel `User` memiliki hubungan dengan tabel `Vehicle` melalui kolom `createdBy`, yang menunjukkan bahwa setiap kendaraan dapat dibuat oleh seorang pengguna.

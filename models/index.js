@@ -1,41 +1,43 @@
-import Sequelize from 'sequelize';
-import fs from 'fs';
-import path from 'path';
-import sequelizeInstance from '../config/database';
+'use strict';
 
-const models = {};
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
+const process = require('process');
+const basename = path.basename(__filename);
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/../config/config.json')[env];
+const db = {};
 
-/**
- * Membaca dan memuat semua definisi model dari file di direktori saat ini,
- * kecuali file `index.js`, kemudian menentukan asosiasi antar model.
- */
+let sequelize;
+if (config.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+} else {
+  sequelize = new Sequelize(config.database, config.username, config.password, config);
+}
 
-// Membaca semua file dalam direktori saat ini, kecuali `index.js`.
-fs.readdirSync(path.resolve(__dirname))
-  .filter(file => file !== 'index.js')
+fs
+  .readdirSync(__dirname)
+  .filter(file => {
+    return (
+      file.indexOf('.') !== 0 &&
+      file !== basename &&
+      file.slice(-3) === '.js' &&
+      file.indexOf('.test.js') === -1
+    );
+  })
   .forEach(file => {
-    // Mengimpor definisi model dari setiap file dan inisialisasi model tersebut.
-    const model = import(path.resolve(__dirname, file)).then(m => m.default(sequelizeInstance, Sequelize.DataTypes));
-
-    // Menyimpan model yang diimpor ke dalam objek `models` dengan nama model sebagai kunci.
-    model.then(m => {
-      models[m.name] = m;
-    });
+    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+    db[model.name] = model;
   });
 
-// Menunggu semua model dimuat sebelum menentukan asosiasi.
-Promise.all(Object.values(models)).then(() => {
-  Object.keys(models).forEach(modelName => {
-    if (models[modelName].associate) {
-      // Menentukan asosiasi (hubungan) antar model jika ada.
-      models[modelName].associate(models);
-    }
-  });
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
 });
 
-// Menambahkan instance Sequelize dan Sequelize library ke dalam objek `models`.
-models.sequelizeInstance = sequelizeInstance;
-models.Sequelize = Sequelize;
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
-// Mengekspor objek `models` untuk digunakan di bagian lain aplikasi.
-export default models;
+module.exports = db;
