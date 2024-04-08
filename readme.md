@@ -1,5 +1,90 @@
 # Catatan BE
 
+## Instalasi Error
+
+Ketemu eror kayak gini wuakakakak
+
+```
+ERROR 1049 (42000): Unknown database 'polisi'
+```
+
+## Solusinya....
+
+### 1. Buat Dulu Databasenya
+
+Sebelum impor file `.sql`, pastikan database `polisi` udah dibuat ya. Bisa kok bikin database lewat MySQL command line interface (CLI), gini caranya:
+
+1. Buka MySQL CLI:
+   - Dari PowerShell atau Command Prompt, ketik aja:
+     ```powershell
+     mysql -u root -p
+     ```
+   - Terus masukin password kamu.
+
+2. Buat Database:
+   - Di MySQL CLI, ketik perintah ini buat bikin database baru:
+     ```sql
+     CREATE DATABASE polisi;
+     ```
+   - Keluar dari MySQL CLI tinggal ketik `exit` atau `quit` terus pencet `Enter` deh.
+
+### 2. Coba Lagi Proses Impornya
+
+Habis database `polisi` berhasil dibuat, coba lagi proses impor pake PowerShell kayak tadi:
+
+Karena saya Sobat Windows jadi kek gini
+```powershell
+Get-Content .\db_fleet.sql | mysql -u root -p polisi
+```
+
+kalo saudara adalah sobat unix, jadi pake ini aja deh
+```
+mysql -u root -p polisi < .\db_fleet.sql
+```
+
+Jangan lupa masukin password ya. Harusnya sekarang proses impor lancar jaya
+
+## Setup Sequelize-cli
+
+Pertama, install dulu `sequelize-cli` pake perintah ini:
+
+```
+npm install --save-dev sequelize-cli
+```
+
+Habis itu, tinggal jalanin:
+
+```
+npx sequelize-cli init
+```
+
+Nanti bakal muncul beberapa folder. Kita fokus ke folder `config` aja, terus isi file `config.json` dengan nama db, merk db, sama password kamu.
+
+Karena di DB ada 9 tabel, kita bikin 9 migrasi per tabelnya pake perintah ini:
+
+```
+npx sequelize-cli migration:generate --name create-user
+npx sequelize-cli migration:generate --name create-vehicle
+npx sequelize-cli migration:generate --name create-vehicle-user
+npx sequelize-cli migration:generate --name create-place-in
+npx sequelize-cli migration:generate --name create-place-out
+npx sequelize-cli migration:generate --name create-task
+npx sequelize-cli migration:generate --name create-vehicle-perawatan
+npx sequelize-cli migration:generate --name create-sent-wa
+npx sequelize-cli migration:generate --name create-webhook-wa
+```
+
+Setelah folder-foldernya kebuat, tugas kita adalah nulis ulang schema yang udah dipikirin pas bikin database sebelumnya. Jangan lupa tulis tipe data, validasi, sama relasinya kayak contoh di folder `models`.
+
+Kalau semuanya udah beres, tinggal gas aja pake perintah ini:
+
+```
+npx sequelize-cli db:migrate
+```
+
+Moga lancar cepet cair
+
+
 ## Bisnis Flow:
 1. User Management:
    - Aplikasi ini memiliki sistem manajemen user dengan tabel "users".
