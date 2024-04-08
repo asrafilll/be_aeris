@@ -1,5 +1,7 @@
 # Catatan BE
 
+![Police](https://media1.tenor.com/m/eflsAfxgrssAAAAC/police-anime-police.gif)
+
 # Table of Contents
 
 - [Catatan BE](#catatan-be)
