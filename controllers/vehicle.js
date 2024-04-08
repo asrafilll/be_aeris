@@ -1,83 +1,57 @@
+import { logger, shtm } from '../config/utility.js';
 
-var ModelVehicle = require('../models/vehicle.js')
-var Vehicle = ModelVehicle.Vehicle
-var util = require('util');
-var futil = require('../config/utility.js');
+import Vehicle  from '../models/vehicle.js';
+import { inspect } from 'util';
 
-var result = {  
-    "status":false,
-    "message": ''
-}
+/**
+ * Menangani permintaan membaca data odometer kendaraan.
+ * Fungsi ini mencari data kendaraan berdasarkan ID kendaraan yang diberikan.
+ * Jika tidak ada data kendaraan yang ditemukan, itu mengembalikan kode status 404 yang menunjukkan data tidak ditemukan.
+ * Jika data kendaraan ditemukan, itu mengembalikan respons sukses yang berisi total jumlah data dan data kendaraan yang ditemukan.
+ *
+ * @param {Object} req - Objek permintaan yang berisi ID kendaraan.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan respons HTTP kembali.
+ */
+const ReadOdometer = async (req, res) => {
+  try {
+    logger.debug(`\n${shtm()}- [ REQ HEADERS ] | INFO ${inspect(req.headers)}`);
+    logger.debug(`\n${shtm()}- [ REQ PARAMS ] | INFO ${inspect(req.params)}`);
+    logger.debug(`\n${shtm()}- [ REQ PARAMS vehicleid ] | INFO ${inspect(req.params.vehicleid)}`);
 
+    const count = await Vehicle.count({
+      where: {
+        vehicleid: req.params.vehicleid,
+      },
+    });
 
-var ReadOdometer = async function(req,res){
-    try {    
+    logger.debug(`\n${shtm()}- [ RESULT COUNT VEHICLE ] | QUERYING ${inspect(count)}`);
 
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ HEADERS] | INFO ' + util.inspect(req.headers));
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS] | INFO ' + util.inspect(req.params));
-        // var vehicleid = req.params.vehicleid
-        
-        
-        // futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  page] | INFO ' + util.inspect(req.headers.page));
-        // futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  rows] | INFO ' + util.inspect(req.headers.rows));
-        // futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS  offset] | INFO ' + util.inspect(req.headers.offset));
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQ PARAMS vehicleid] | INFO ' + util.inspect(req.params.vehicleid));
+    const resp = await Vehicle.findAll({
+      raw: true,
+      where: {
+        vehicleid: req.params.vehicleid,
+      },
+      order: [['id', 'ASC']],
+    });
 
-        const count = await Vehicle.count({
-            where: {
-                vehicleid: req.params.vehicleid
-            }
-        });
+    logger.debug(`\n${shtm()}- [ RESULT VEHICLE ALL ] | QUERYING ${inspect(resp)}`);
+    logger.debug(`\n${shtm()}- [ RESULT VEHICLE ALL ] | QUERYING ${inspect(resp.init_odometer)}`);
 
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT COUNT VEHICLE ] | QUERING ' + util.inspect(count));
-        
-        // var limit = parseInt(req.headers.rows)
-        // var offset = parseInt(req.headers.offset)
-        // var page = parseInt(req.headers.page)
+    const response = { total: count, rows: resp };
 
-        var resp = await Vehicle.findAll({ raw:true,
-            where: {
-                vehicleid: req.params.vehicleid
-            },
-            order: [
-                ['id', 'ASC'],
-                ]
-            });
+    logger.debug(`\n${shtm()}- [ RESULT RESPONSE ] | QUERYING ${inspect(response)}`);
 
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESULT VEHICLE ALL] | QUERING ' + util.inspect(resp));
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESULT VEHICLE ALL] | QUERING ' + util.inspectresp.init_odometer)
-            // var rows_data = []
-            // rows_data.push(result)
-            var j=1
-            // if (offset == 0 ){
-            //     j=1
-            // }else{
-            //     j= (offset * (page-1))+1
-            // }
+    res.status(200).json({
+      status: 'success',
+      data: response,
+    });
+  } catch (err) {
+    logger.debug(`\n${shtm()}- [ ERROR ] | QUERYING ${inspect(err)}`);
+    res.status(400).json({
+      status: 'failed',
+      data: 'Read data failed',
+    });
+  }
+};
 
-            // for (i=0;i<=resp.length-1;i++){
-            //     resp[i].no = j
-            //     j++
-            // }
-
-            var response = {"total":count,"rows":resp}   
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESULT RESPONSE] | QUERING ' + util.inspect(response));  
-            result.code = 200
-            result.status ="success"
-            result.data = response
-            res.send(result);
-
-    } catch (err){
-
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        result.code = 400
-        result.status ="failed"
-        result.data = "Read data failed"
-        res.send(result);
-    }
-}
-
-
-module.exports = {
-    ReadOdometer
-}
+export { ReadOdometer };

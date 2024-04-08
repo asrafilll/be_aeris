@@ -1,441 +1,313 @@
-// var Model = require('../models/user.js')
-// var User = Model.User
-const db = require('../models');
+import * as jwt from "jsonwebtoken";
+
+import { logger, setEnvValue, shtm } from '../config/utility.js';
+
+import Sequelize from "sequelize";
+import axios from "axios";
+import crypto from "crypto";
+import db from "../models/index.cjs";
+import dotenv from "dotenv";
+import nodemailer from "nodemailer";
+import util from "util";
+
 const User = db.user;
-
-var axios = require('axios')
-var jwt = require('jsonwebtoken')
-var util = require('util');
-var futil = require('../config/utility.js');
-const nodemailer = require("nodemailer");
-const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
-const crypto = require('crypto');
 
+dotenv.config();
 
-require('dotenv').config();
+/**
+ * Menangani permintaan pendaftaran pengguna.
+ * Fungsi ini memeriksa apakah pengguna dengan nama pengguna atau email yang diberikan sudah ada di dalam database.
+ * Jika pengguna sudah ada, ia mengembalikan kode status 400 yang menunjukkan permintaan tidak valid dengan pesan bahwa data sudah ada.
+ * Jika tidak ada pengguna yang ditemukan, ia membuat pengguna baru dengan data yang diberikan dalam badan permintaan, mencatat aksi tersebut, dan mengembalikan kode status 201 yang menunjukkan bahwa pengguna baru telah berhasil dibuat.
+ *
+ * @param {Object} req - Objek permintaan yang mengandung detail pengguna di dalam badannya.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan respons HTTP kembali.
+ */
 
-var Register = async function(req,res){
-    // try
-    futil.logger.debug('\n' + futil.shtm() + '- [ REGISTER ] | INFO ' + util.inspect(req.body));
+const Register = async (req, res) => {
+  try {
+    logger.debug(
+      "\n" + shtm() + "- [ REGISTER ] | INFO " + util.inspect(req.body)
+    );
     const user = await User.findAll({
-        where: {
-            [Op.or]: {
-              username: req.body.username,
-              email: req.body.email,
-            },
-          },
-          raw:true
+      where: {
+        [Op.or]: {
+          username: req.body.username,
+          email: req.body.email,
+        },
+      },
+      raw: true,
     });
-    
-    futil.logger.debug('\n' + futil.shtm() + '- [ RESULT ] | QUERING ' + util.inspect(user));
-    // res.send(user);
-    var data = user
 
-    if (data.length>0){
-        // data sudah ada
-        var result = {
-            "status" : true,
-            "message": 'success',
-            "data"   : 'Data sudah ada'
-        }
+    logger.debug(
+      "\n" + shtm() + "- [ RESULT ] | QUERING " + util.inspect(user)
+    );
 
-        res.setHeader("Content-Type", "application/json");
-        //res.cookie("token", token, { maxAge: jwtExpirySeconds * 1000 })
-        // res.setHeader("token",token)
-        res.writeHead(200);
-        res.end(JSON.stringify(result, null, 3));
-    }else{
-        // register
+    if (user.length > 0) {
+      res.status(400).json({
+        status: false,
+        message: "Data already exists",
+      });
+    } else {
+      const newUser = await User.create(req.body);
+      logger.debug(
+        "\n" + shtm() + "- [ RESULT ] | QUERING " + util.inspect(newUser)
+      );
 
-        try {
-            const user = await User.create(req.body);
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESULT ] | QUERING ' + util.inspect(user));
-
-            var result = {
-                "status" : true,
-                "message": 'success',
-                "data"   : ''
-            }
-
-            result.code = 200
-            result.data = "New user created"
-            res.send(result);
-        } catch (err) {
-            futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-            // result.code = 400
-            // result.status ="failed"
-            // result.data = "Insert data failed"
-            // res.send(result);
-
-            var result = {
-                "status" : true,
-                "message": 'success',
-                "data"   : err
-            }
-
-            res.setHeader("Content-Type", "application/json");
-            //res.cookie("token", token, { maxAge: jwtExpirySeconds * 1000 })
-            // res.setHeader("token",token)
-            res.writeHead(200);
-            res.end(JSON.stringify(result, null, 3));
-        }
-
+      res.status(201).json({
+        status: true,
+        message: "New user created",
+      });
     }
-}
-
-var Login = async function(req,res){
-    // try {
-        futil.logger.debug('\n' + futil.shtm() + '- [ LOGIN ] | INFO ' + util.inspect(req.body));
-
-        const user = await User.findAll({
-            where: {
-                username: req.body.username,
-                password: req.body.password
-              },
-              raw:true
-        });
-        
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT ] | QUERING ' + util.inspect(user));
-        // res.send(user);
-        var data = user
-
-        if (data.length>0){
-            var result = {
-                "status" : true,
-                "message": 'success',
-                "data"   : data
-            }
-    
-            const jwtKey = process.env.TOKEN_SECRET
-            const jwtExpirySeconds = '1d'
-    
-            var username = data[0].username
-            // console.log(username)
-    
-            const token = jwt.sign({ username }, jwtKey, {
-                algorithm: "HS256",
-                // expiresIn: jwtExpirySeconds,
-            })
-    
-            console.log("token:", token)
-
-            var url = process.env.URL_LOGIN_AERTRACK
-            var username = process.env.AERTRACK_USERNAME
-            var password = process.env.AERTRACK_PASSWORD
-         
-            var body ={
-             username: username,
-             password: password
-            }
-     
-           
-            futil.logger.debug('\n' + futil.shtm() + '- [ URL ]  ' + util.inspect(url));
-            futil.logger.debug('\n' + futil.shtm() + '- [ BODY REQUEST]  ' + util.inspect(body));
-     
-            axios.post(url,body).then(function (response) {
-
-                futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE DATA ]  ' + util.inspect(response.data));
-                var access_token = response.data.token
-                futil.setEnvValue("TOKEN_AERTRAK",access_token)
-                
-                res.setHeader("Content-Type", "application/json");
-                //res.cookie("token", token, { maxAge: jwtExpirySeconds * 1000 })
-                res.setHeader("token",token)
-                res.writeHead(200);
-                res.end(JSON.stringify(result, null, 3));
-
-
-            }).catch(function (error) {
-                
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-                // console.log(error.response.data);
-                // console.log(error.response.status);
-                // console.log(error.response.headers);
-              } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-                // console.log(error.request);
-              } else {
-                // Something happened in setting up the request that triggered an Error
-                // console.log('Error', error.message);
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-              }
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
-            //   console.log(error.config);
-            var result = {  
-
-                "status":false,
-                "message": 'ERROR CONNECTION'
-            }
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(400);
-            res.end(JSON.stringify(result,null,3));
-         })
-    
-           
-        }else{
-            futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect('DATA NOT FOUND'));
-                
-                var result = {  "status":false,
-                                "message":"data not found"
-                             }
-                res.setHeader("Content-Type", "application/json");
-                res.writeHead(400);
-                res.end(JSON.stringify(result, null, 3));
-        }
-        
-
-
- 
-}
-
-var ForgotPassword = async function  (req,res){
-    futil.logger.debug('\n' + futil.shtm() + '- [ FORGOT PASSWORD ] | INFO ' + util.inspect(req.body));
-
-    // cek username atau email memang ada, jika ada kirim email berupa link untuk ubah password
-
-    futil.logger.debug('\n' + futil.shtm() + '- [ FORGOT PASSWORD ] | INFO ' + util.inspect(req.body));
-    try{
-        const user = await User.findAll({
-            where: {
-                [Op.or]: {
-                  username: req.body.param,
-                  email: req.body.param,
-                },
-              },
-              raw:true
-        });
-
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESULT ] | QUERING ' + util.inspect(user));
-        // res.send(user);
-        var data = await user;
-
-        if (data.length>0){
-            console.log(data)
-            // data sudah ada
-            // kirim email
-
-            // console.log('email',data[0].email);
-
-            var email = data[0].email;
-            console.log('email1',email)
-
-            if (email.length>0){
-                
-            const transporter = nodemailer.createTransport({
-                service: "Gmail",
-                host: "smtp.gmail.com",
-                port: 465,
-                secure: false,
-                auth: {
-                  user: "bosskorlantas@gmail.com",
-                  pass: "hjiu sdzg zaox gpzb",
-                },
-              });
-
-              console.log('transpoter',transporter)
-
-              console.log('email2',email)
-
-                // plain text
-                const plainText = data[0].username;
-
-                // encryption key
-                const key = 'mysecretkey';
-
-                // encryption algorithm
-                const algorithm = 'aes-256-cbc';
-
-                // create a cipher object
-                const cipher = crypto.createCipher(algorithm, key);
-
-                // encrypt the plain text
-                let encrypted = cipher.update(plainText, 'utf8', 'hex');
-                encrypted += cipher.final('hex');
-                console.log(encrypted);
-
-            //     var mailOptions = {
-            //     from: "adm.korlantas@gmail.com",
-            //     to: email,
-            //     subject: "Lupa Password",
-            //     text: "Harap klik link dibawah untuk lupa password",
-            //     html: '<p>Click <a href="http://147.139.144.120:3001/lupa_password/' + encrypted + '">here</a> to reset your password</p>'
-            //   };
-
-            var mailOptions = {
-                from: "adm.korlantas@gmail.com",
-                to: email,
-                subject: "Lupa Password",
-                text: "Harap klik link dibawah untuk lupa password",
-                html: '<p>Click <a href="http://147.139.144.120:3001/lupa_password/' + encrypted + '">here</a> to reset your password</p>'
-              };
-              
-
-              console.log('mailOptions',mailOptions)
-          
-
-              transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                  console.error("Error sending email: ", error);
-                } else {
-                  console.log("Email sent: ", info.response);
-                  var result = {
-                    "status" : true,
-                    "message": 'success',
-                    "data"   : 'email terkirim'
-                    
-                }
-
-                res.setHeader("Content-Type", "application/json");
-                //res.cookie("token", token, { maxAge: jwtExpirySeconds * 1000 })
-                // res.setHeader("token",token)
-                res.writeHead(200);
-                res.end(JSON.stringify(result, null, 3));
-        
-                }
-              });
-            }
-
-        }else{
-            var result = {
-                "status" : true,
-                "message": 'success',
-                "data"   : 'akun tidak ditemukan'
-            }
-    
-            res.setHeader("Content-Type", "application/json");
-            //res.cookie("token", token, { maxAge: jwtExpirySeconds * 1000 })
-            // res.setHeader("token",token)
-            res.writeHead(200);
-            res.end(JSON.stringify(result, null, 3));
-        }
-    }catch (err) {
-        futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-        // result.code = 400
-        // result.status ="failed"
-        // result.data = "Insert data failed"
-        // res.send(result);
-
-        var result = {
-            "status" : true,
-            "message": 'success',
-            "data"   : err
-        }
-
-        res.setHeader("Content-Type", "application/json");
-        //res.cookie("token", token, { maxAge: jwtExpirySeconds * 1000 })
-        // res.setHeader("token",token)
-        res.writeHead(200);
-        res.end(JSON.stringify(result, null, 3));
-    }
-    
-    
-    
-    
-
-}
-
-var ChangePassword = async function(req,res){
-    futil.logger.debug('\n' + futil.shtm() + '- [ CHANGE PASSWORD ] | INFO ' + util.inspect(req.body));
-
-    // encrypted text
-const encryptedText = req.body.data;
-const password = req.body.password
-
-// encryption key
-const key = 'mysecretkey';
-
-// encryption algorithm
-const algorithm = 'aes-256-cbc';
-
-// create a decipher object
-const decipher = crypto.createDecipher(algorithm, key);
-
-// decrypt the encrypted text
-let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
-decrypted += decipher.final('utf8');
-// console.log(decrypted);
-futil.logger.debug('\n' + futil.shtm() + '- [ CHANGE PASSWORD ] | INFO ' + util.inspect(decrypted));
-
-var username = decrypted
-
-//change password
-
-try {
-    const user = await User.update({password:password}, {
-        where: {
-            username: username
-        }
+  } catch (err) {
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+    res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      error: err.message,
     });
-    var result = {}
+  }
+};
 
-    result.status = true
-    result.message= 'success'
-    result.data = "Update data success"
-    res.send(result);
-} catch (err) {
-    futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | QUERING ' + util.inspect(err));
-    var result = {}
-    result.status =false
-    result.message='failed'
-    result.data = "Update data failed"
-    res.send(result);
-}
+/**
+ * Menangani permintaan login pengguna.
+ * Ini mencari pengguna dengan nama pengguna dan kata sandi yang cocok yang diberikan dalam badan permintaan.
+ * Jika tidak ada pengguna yang cocok ditemukan, itu mengembalikan kode status 401 yang menunjukkan akses tidak sah.
+ * Jika pengguna yang cocok ditemukan, itu menghasilkan token JWT, masuk ke sistem lain menggunakan axios untuk melakukan permintaan POST HTTP, memperbarui variabel lingkungan dengan token yang diterima, dan mengembalikan respons sukses dengan token JWT yang dihasilkan.
+ *
+ * @param {Object} req - Objek permintaan yang mengandung kredensial login.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan respons HTTP kembali.
+ */
 
-}
+const Login = async (req, res) => {
+  try {
+    logger.debug(
+      "\n" + shtm() + "- [ LOGIN ] | INFO " + util.inspect(req.body)
+    );
 
-var authAccessToken = async function (req,res,next){
+    const user = await User.findOne({
+      where: {
+        username: req.body.username,
+        password: req.body.password,
+      },
+      raw: true,
+    });
 
-    futil.logger.debug('\n' + futil.shtm() + '- [ HEADERS ] | INFO ' + util.inspect(req.headers));
-    const token = req.headers.token
-    // console.log(token)
-    // const params = req.params
-    // var page = req.headers.page
-    // var rows = req.headers.rows
-    // var offset = req.headers.offset
-
-    futil.logger.debug('\n' + futil.shtm() + '- [ TOKEN ] | INFO ' + util.inspect(token));
-
-    const jwtKey = process.env.TOKEN_SECRET
-
-    try{
-        var payload = jwt.verify(token, jwtKey)
-        // console.log(payload)
-        var result = {
-                      "status":true,
-                      "message":"success",
-                      "data":payload.username
-                    }
-
-      
-        next()
-
-    }catch (err){
-
-        // futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | AUTH ' + util.inspect(err));
-
-        var result = {  "status":false,
-                        "message":"token is expired"
-                     }
-        res.setHeader("Content-Type", "application/json");
-        res.writeHead(400);
-        res.end(JSON.stringify(result,null,3));   
+    if (!user) {
+      return res.status(401).json({
+        status: false,
+        message: "Invalid credentials",
+      });
     }
-}
 
+    const token = jwt.sign(
+      { username: user.username },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
 
-module.exports = {
-    Login,
-    Register,
-    ForgotPassword,
-    ChangePassword,
-    authAccessToken
-}
+    const response = await axios.post(process.env.URL_LOGIN_AERTRACK, {
+      username: process.env.AERTRACK_USERNAME,
+      password: process.env.AERTRACK_PASSWORD,
+    });
+
+    const accessToken = response.data.token;
+    setEnvValue("TOKEN_AERTRAK", accessToken);
+
+    res.status(200).json({
+      status: true,
+      message: "Login successful",
+      token,
+    });
+  } catch (err) {
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+    res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Menangani permintaan lupa kata sandi.
+ * Fungsi ini mencari pengguna dengan nama pengguna atau email yang diberikan.
+ * Jika tidak ada pengguna yang ditemukan, itu mengembalikan kode status 404 yang menunjukkan pengguna tidak ditemukan.
+ * Jika pengguna ditemukan, itu menghasilkan teks sandi dari nama pengguna, membangun email dengan tautan reset kata sandi yang mengandung teks sandi, mengirim email ke alamat email pengguna, dan mengembalikan respons sukses yang menunjukkan email telah dikirim.
+ *
+ * @param {Object} req - Objek permintaan yang berisi nama pengguna atau email pengguna.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan respons HTTP kembali.
+ */
+
+const ForgotPassword = async (req, res) => {
+  try {
+    logger.debug(
+      "\n" +
+        shtm() +
+        "- [ FORGOT PASSWORD ] | INFO " +
+        util.inspect(req.body)
+    );
+
+    const user = await User.findOne({
+      where: {
+        [Op.or]: {
+          username: req.body.param,
+          email: req.body.param,
+        },
+      },
+      raw: true,
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PW
+      },
+    });
+
+    const plainText = user.username;
+    const key = process.env.SECRET_KEY
+    const algorithm = "aes-256-cbc";
+    const cipher = crypto.createCipher(algorithm, key);
+    let encrypted = cipher.update(plainText, "utf8", "hex");
+    encrypted += cipher.final("hex");
+
+    const mailOptions = {
+      from: "adm.korlantas@gmail.com",
+      to: user.email,
+      subject: "Lupa Password",
+      text: "Harap klik link dibawah untuk lupa password",
+      html: `<p>Click <a href="http://147.139.144.120:3001/lupa_password/${encrypted}">here</a> to reset your password</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({
+      status: true,
+      message: "Email sent",
+    });
+  } catch (err) {
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+    res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Menangani permintaan untuk mengubah kata sandi.
+ * Fungsi ini mendekripsi teks nama pengguna yang terenkripsi yang diterima dalam badan permintaan, memperbarui kata sandi pengguna dengan kata sandi baru yang diberikan, dan mengembalikan respons sukses yang menunjukkan kata sandi telah berhasil diperbarui.
+ * Jika tidak ada pengguna yang cocok ditemukan atau dekripsi gagal, itu mengembalikan kode status 404 yang menunjukkan pengguna tidak ditemukan atau respons kesalahan untuk setiap pengecualian.
+ *
+ * @param {Object} req - Objek permintaan yang mengandung nama pengguna terenkripsi dan kata sandi baru.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan respons HTTP kembali.
+ */
+
+const ChangePassword = async (req, res) => {
+  try {
+    logger.debug(
+      "\n" +
+        shtm() +
+        "- [ CHANGE PASSWORD ] | INFO " +
+        util.inspect(req.body)
+    );
+
+    const encryptedText = req.body.data;
+    const password = req.body.password;
+    const key = process.env.SECRET_KEY
+    const algorithm = "aes-256-cbc";
+    const decipher = crypto.createDecipher(algorithm, key);
+    let decrypted = decipher.update(encryptedText, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+
+    const [updatedRows] = await User.update(
+      { password },
+      {
+        where: {
+          username: decrypted,
+        },
+      }
+    );
+
+    if (updatedRows === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Password updated successfully",
+    });
+  } catch (err) {
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+    res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Middleware untuk memverifikasi token akses.
+ * Fungsi ini memeriksa token yang disediakan dalam header permintaan, memverifikasi token menggunakan rahasia yang didefinisikan dalam variabel lingkungan, dan menetapkan payload ke objek permintaan jika token valid.
+ * Jika token tidak valid, itu mengembalikan kode status 401 dengan pesan yang menunjukkan token tidak valid.
+ *
+ * @param {Object} req - Objek permintaan yang mengandung header dengan token.
+ * @param {Object} res - Objek respons yang digunakan untuk mengirimkan respons HTTP kembali.
+ * @param {Function} next - Fungsi callback untuk melanjutkan ke middleware berikutnya.
+ */
+
+const authAccessToken = async (req, res, next) => {
+  try {
+    logger.debug(
+      "\n" + shtm() + "- [ HEADERS ] | INFO " + util.inspect(req.headers)
+    );
+    const token = req.headers.token;
+
+    logger.debug(
+      "\n" + shtm() + "- [ TOKEN ] | INFO " + util.inspect(token)
+    );
+
+    const payload = jwt.verify(token, process.env.TOKEN_SECRET);
+    req.user = payload;
+    next();
+  } catch (err) {
+    logger.debug(
+      "\n" + shtm() + "- [ ERROR ] | AUTH " + util.inspect(err)
+    );
+    res.status(401).json({
+      status: false,
+      message: "Invalid token",
+    });
+  }
+};
+
+export { ChangePassword, ForgotPassword, Login, Register, authAccessToken };
+

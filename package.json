@@ -2,7 +2,7 @@
   "name": "pattern",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon indexMobile.js"
@@ -10,30 +10,32 @@
   "author": "syerif",
   "license": "ISC",
   "dependencies": {
-    "@googlemaps/google-maps-services-js": "^3.3.33",
+    "@googlemaps/google-maps-services-js": "^3.3.42",
     "amqplib": "^0.10.3",
-    "axios": "^1.4.0",
-    "body-parser": "^1.20.1",
+    "axios": "^1.6.8",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
-    "dotenv": "^16.0.3",
-    "ejs": "^3.1.8",
-    "express": "^4.18.2",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.9",
+    "express": "^4.19.2",
     "express-fileupload": "^1.5.0",
     "fs": "0.0.1-security",
-    "jsonwebtoken": "^8.5.1",
-    "moment": "^2.29.4",
-    "moment-timezone": "^0.5.40",
-    "multer": "^1.4.5-lts.1",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "moment-timezone": "^0.5.45",
+    "multer": "1.4.5-lts.1",
     "mysql": "^2.18.1",
-    "mysql2": "^3.0.1",
-    "nodemailer": "^6.9.9",
-    "nodemon": "^2.0.20",
+    "mysql2": "^3.9.3",
+    "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.0",
     "os": "^0.1.2",
     "path": "^0.12.7",
-    "sequelize": "^6.28.0",
-    "winston": "^3.8.2",
-    "winston-daily-rotate-file": "^4.7.1"
+    "sequelize": "^6.37.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "winston": "^3.13.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "repository": {
     "type": "git",
@@ -43,5 +45,8 @@
     "url": "https://github.com/shivavalkyre/Fleet_API_Mobile/issues"
   },
   "homepage": "https://github.com/shivavalkyre/Fleet_API_Mobile#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "sequelize-cli": "^6.6.2"
+  }
 }
