@@ -175,6 +175,10 @@ router.get(
   }
 );
 
+router.get("/api/pattern/history", Auth.authAccessToken, function (req, res) {
+  Notification.GetHistory(req, res);
+});
+
 // ============================= ODOMETER ============================================================
 
 router.get(

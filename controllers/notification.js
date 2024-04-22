@@ -36,6 +36,46 @@ var GetNotificationByVehicleUid = async function (req, res) {
   }
 };
 
+const GetHistory = async (req, res) => {
+  try {
+    // Parse startDate and endDate from request query
+    const { startDate, endDate } = req.query;
+
+    // Fetch data from the database based on the provided criteria
+    const history = await Notification.findAll({
+      attributes: [
+        "latitude",
+        "longitude",
+        "createdAt",
+        "speed",
+        "actualValue",
+      ],
+      where: {
+        createdAt: {
+          [Op.between]: [startDate, endDate],
+        },
+        type: "geofence",
+      },
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json({
+      code: 200,
+      status: "success",
+      data: history,
+    });
+  } catch (error) {
+    // Handle errors
+    console.error("Error fetching history:", error);
+    res.status(500).json({
+      code: 500,
+      status: "failed",
+      error: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   GetNotificationByVehicleUid,
+  GetHistory,
 };
