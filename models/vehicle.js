@@ -1,58 +1,65 @@
-// import sequelize 
-var sequelize = require('sequelize')
-// import connection 
-var con = require('../config/database.js')
+// import sequelize
+var sequelize = require("sequelize");
+// import connection
+var con = require("../config/database.js");
 
 const { DataTypes } = sequelize;
 
 // Define schema
-const Vehicle = con.db.define('vehicles', {
+const Vehicle = con.db.define(
+  "vehicles",
+  {
     // Define attributes
     vehicleid: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     vehicle_brand: {
-        type: DataTypes.STRING
-      },
+      type: DataTypes.STRING,
+    },
     vehicle_type: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     vehicle_condition: {
-        type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     power_status: {
-        type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     ign_status: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     speed: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     operating_time: {
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
     },
-    tagging:{
-        type: DataTypes.STRING
+    tagging: {
+      type: DataTypes.STRING,
     },
-    assignment:{
-        type: DataTypes.INTEGER
+    assignment: {
+      type: DataTypes.INTEGER,
     },
-    simId:{
-        type:DataTypes.STRING
+    simId: {
+      type: DataTypes.STRING,
     },
-    init_odometer:{
-        type:DataTypes.INTEGER
+    init_odometer: {
+      type: DataTypes.INTEGER,
     },
-    odometer:{
-        type:DataTypes.INTEGER
-    }
-  },{
+    vehicleSclId: {
+      type: DataTypes.STRING,
+    },
+    // odometer:{
+    //     type:DataTypes.INTEGER
+    // }
+  },
+  {
     // Freeze Table Name
-    freezeTableName: true
-  });
-   
-  // Export model Product
-  module.exports = { 
-    Vehicle
+    freezeTableName: true,
   }
+);
+
+// Export model Product
+module.exports = {
+  Vehicle,
+};

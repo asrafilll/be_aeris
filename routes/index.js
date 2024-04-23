@@ -189,4 +189,14 @@ router.get(
   }
 );
 
+// ============================= PROFILE ============================================================
+
+router.get(
+  "/api/pattern/vehicle/:sclid/users",
+  Auth.authAccessToken,
+  function (req, res) {
+    Vehicle_User.GetProfileData(req, res);
+  }
+);
+
 module.exports.router = router;
