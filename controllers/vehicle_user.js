@@ -1,9 +1,7 @@
-const sequelize = require("sequelize");
-const User = require("../models/user.js")(sequelize, sequelize.DataTypes);
-
 var Model = require("../models/vehicle_user.js");
 var Vehicle_User = Model.Vehicle_User;
-var UserModel = require("../models/user.js");
+const db = require("../models");
+const User = db.user;
 var ModelVehicle = require("../models/vehicle.js");
 var Vehicle = ModelVehicle.Vehicle;
 var util = require("util");
@@ -196,18 +194,11 @@ var Delete = async function (req, res) {
 };
 var GetProfileData = async function (req, res) {
   try {
-    // Ensure that the User model is imported correctly
-    console.log(UserModel); // Check if User is defined and contains the expected properties
-
-    // Find entry in Vehicle_User table for a specific vehicle
     const vehicleUser = await Vehicle_User.findOne({
       where: {
         sclid: req.params.sclid,
       },
     });
-
-    // Ensure that vehicleUser is defined and contains the expected properties
-    console.log(vehicleUser);
 
     if (!vehicleUser) {
       return res.status(404).json({
@@ -217,23 +208,28 @@ var GetProfileData = async function (req, res) {
       });
     }
 
+    const vehicle = await Vehicle.findAll({
+      where: {
+        vehicleSclId: req.params.sclid,
+      },
+      attributes: ["vehicleId", "init_odometer"],
+    });
+
     // Extract user ID from the result
     const userId = vehicleUser.userid;
 
     // Fetch user associated with the userId
-    const user = await UserModel.findAll({
+    const user = await User.findAll({
       where: {
         id: userId,
       },
+      attributes: ["username", "email", "image"],
     });
-
-    // Ensure that user is defined and contains the expected properties
-    console.log(user);
 
     // Combine the user and vehicle data into a single response
     const resultData = {
       user: user,
-      vehicleUser: vehicleUser,
+      vehicle: vehicle,
     };
 
     // Send the combined data as the response
