@@ -199,4 +199,12 @@ router.get(
   }
 );
 
+router.post(
+  "/api/pattern/editProfile/:userId",
+  Auth.authAccessToken,
+  function (req, res) {
+    Vehicle_User.UpdateUserProfile(req, res);
+  }
+);
+
 module.exports.router = router;

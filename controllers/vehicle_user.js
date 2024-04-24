@@ -6,6 +6,8 @@ var ModelVehicle = require("../models/vehicle.js");
 var Vehicle = ModelVehicle.Vehicle;
 var util = require("util");
 var futil = require("../config/utility.js");
+const path = require("path");
+
 var result = {
   code: "",
   status: "",
@@ -248,6 +250,44 @@ var GetProfileData = async function (req, res) {
   }
 };
 
+const UpdateUserProfile = async (req, res) => {
+  try {
+    if (!req.files || !req.files.image) {
+      return res.status(400).json({ error: "No image file uploaded" });
+    }
+
+    const userId = req.params.userId;
+    const user = await User.findOne({ where: { id: userId } });
+    const sampleFile = req.files.image;
+    const uploadPath = path.join(
+      __dirname,
+      "../public/uploads",
+      `${user.username}_profile.${sampleFile.name.split(".").pop()}`
+    );
+
+    sampleFile.mv(uploadPath, async function (err) {
+      if (err) {
+        return res
+          .status(500)
+          .json({ error: "Error uploading image", details: err });
+      }
+
+      const imagePath = `/uploads/${user.username}_profile.${sampleFile.name
+        .split(".")
+        .pop()}`;
+      await User.update({ image: imagePath }, { where: { id: userId } });
+
+      return res.status(200).json({
+        message: "User profile image updated successfully",
+        imagePath,
+      });
+    });
+  } catch (error) {
+    console.error("Error updating user profile image:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   Create,
   Read,
@@ -257,4 +297,5 @@ module.exports = {
   Update,
   Delete,
   GetProfileData,
+  UpdateUserProfile,
 };

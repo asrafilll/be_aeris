@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
       area: {
         type: DataTypes.STRING,
       },
+      image: {
+        type: DataTypes.STRING,
+      },
       createdBy: {
         type: DataTypes.INTEGER,
       },
