@@ -1,7 +1,9 @@
+const sequelize = require("sequelize");
+const User = require("../models/user.js")(sequelize, sequelize.DataTypes);
+
 var Model = require("../models/vehicle_user.js");
 var Vehicle_User = Model.Vehicle_User;
 var UserModel = require("../models/user.js");
-var User = UserModel.User;
 var ModelVehicle = require("../models/vehicle.js");
 var Vehicle = ModelVehicle.Vehicle;
 var util = require("util");
@@ -192,41 +194,46 @@ var Delete = async function (req, res) {
     res.send(result);
   }
 };
-
 var GetProfileData = async function (req, res) {
   try {
-    // Find all entries in Vehicle_User table for a specific vehicle
-    const vehicleUsers = await Vehicle_User.findOne({
+    // Ensure that the User model is imported correctly
+    console.log(UserModel); // Check if User is defined and contains the expected properties
+
+    // Find entry in Vehicle_User table for a specific vehicle
+    const vehicleUser = await Vehicle_User.findOne({
       where: {
         sclid: req.params.sclid,
       },
     });
 
-    console.log("vehicleUsers:", vehicleUsers);
-    // Extract user IDs and vehicle IDs from the result
-    const userId = vehicleUsers ? vehicleUsers.userid : null;
-    const vehicleSclId = vehicleUsers ? vehicleUsers.sclid : null;
+    // Ensure that vehicleUser is defined and contains the expected properties
+    console.log(vehicleUser);
 
-    console.log("userId:", userId);
-    console.log("vehicleSclId:", vehicleSclId);
+    if (!vehicleUser) {
+      return res.status(404).json({
+        code: 404,
+        status: "failed",
+        error: "Vehicle user not found",
+      });
+    }
 
-    // Fetch data from User and Vehicles tables based on the extracted IDs
-    const vehicles = await Vehicle.findOne({
-      where: {
-        vehicleSclId: vehicleSclId,
-      },
-    });
+    // Extract user ID from the result
+    const userId = vehicleUser.userid;
 
-    const users = await User.findAll({
+    // Fetch user associated with the userId
+    const user = await UserModel.findAll({
       where: {
         id: userId,
       },
     });
 
+    // Ensure that user is defined and contains the expected properties
+    console.log(user);
+
     // Combine the user and vehicle data into a single response
     const resultData = {
-      users: users,
-      vehicles: vehicles,
+      user: user,
+      vehicleUser: vehicleUser,
     };
 
     // Send the combined data as the response
@@ -236,7 +243,7 @@ var GetProfileData = async function (req, res) {
       data: resultData,
     });
   } catch (err) {
-    console.error("Error fetching vehicle users:", err);
+    console.error("Error fetching profile data:", err);
     res.status(500).json({
       code: 500,
       status: "failed",
