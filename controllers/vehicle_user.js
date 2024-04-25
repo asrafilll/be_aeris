@@ -259,10 +259,16 @@ const UpdateUserProfile = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findOne({ where: { id: userId } });
     const sampleFile = req.files.image;
+
+    const now = new Date();
+    const currentTime = `${now.getHours()}${now.getMinutes()}${now.getSeconds()}`;
+
     const uploadPath = path.join(
       __dirname,
       "../public/uploads",
-      `${user.username}_profile.${sampleFile.name.split(".").pop()}`
+      `${user.username}_${currentTime}_profile.${sampleFile.name
+        .split(".")
+        .pop()}`
     );
 
     sampleFile.mv(uploadPath, async function (err) {
@@ -272,9 +278,9 @@ const UpdateUserProfile = async (req, res) => {
           .json({ error: "Error uploading image", details: err });
       }
 
-      const imagePath = `/uploads/${user.username}_profile.${sampleFile.name
-        .split(".")
-        .pop()}`;
+      const imagePath = `/uploads/${
+        user.username
+      }_${currentTime}_profile.${sampleFile.name.split(".").pop()}`;
       await User.update({ image: imagePath }, { where: { id: userId } });
 
       return res.status(200).json({
