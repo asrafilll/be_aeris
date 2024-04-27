@@ -8,6 +8,7 @@ var Auth = require("../controllers/auth.js");
 var Task = require("../controllers/task.js");
 var Vehicle = require("../controllers/vehicle.js");
 var Notification = require("../controllers/notification.js");
+var Setting = require("../controllers/setting.js");
 var util = require("util");
 var futil = require("../config/utility.js");
 const path = require("path");
@@ -204,6 +205,16 @@ router.post(
   Auth.authAccessToken,
   function (req, res) {
     Vehicle_User.UpdateUserProfile(req, res);
+  }
+);
+
+// ============================= SETTING  ============================================================
+
+router.get(
+  "/api/pattern/setting/whatsapp",
+  Auth.authAccessToken,
+  function (req, res) {
+    Setting.GetWhatsappNumber(req, res);
   }
 );
 
