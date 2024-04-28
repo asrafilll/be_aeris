@@ -1,70 +1,77 @@
-// import sequelize 
-var sequelize = require('sequelize')
-// import connection 
-var con = require('../config/database.js')
+// import sequelize
+var sequelize = require("sequelize");
+// import connection
+var con = require("../config/database.js");
 
 const { DataTypes } = sequelize;
 
 // Define schema
-const Task = con.db.define('tasks', {
+const Task = con.db.define(
+  "tasks",
+  {
     // Define attributes
     task: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     task_date: {
-        type: DataTypes.DATE
-      },
+      type: DataTypes.DATE,
+    },
     task_time: {
-        type: DataTypes.TIME
-      },
+      type: DataTypes.TIME,
+    },
     task_address: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     task_lat: {
-        type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     task_lon: {
-        type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     task_status: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     task_type: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     userid: {
-      type: DataTypes.INTEGER
+      type: DataTypes.INTEGER,
     },
-    user_lat:{
-      type: DataTypes.STRING
+    user_lat: {
+      type: DataTypes.STRING,
     },
-    user_lon:{
-      type: DataTypes.STRING
+    user_lon: {
+      type: DataTypes.STRING,
     },
-    vehicleid:{
-      type: DataTypes.STRING
+    vehicleid: {
+      type: DataTypes.STRING,
     },
-    vehicle_lat:{
-      type: DataTypes.STRING
+    vehicle_lat: {
+      type: DataTypes.STRING,
     },
-    vehicle_lon:{
-      type: DataTypes.STRING
+    vehicle_lon: {
+      type: DataTypes.STRING,
     },
-    path:{
-      type: DataTypes.TEXT
+    path: {
+      type: DataTypes.TEXT,
     },
-    filename:{
-      type: DataTypes.STRING
-    }
-  },{
+    filename: {
+      type: DataTypes.STRING,
+    },
+    desc: {
+      type: DataTypes.STRING,
+    },
+  },
+  {
     // Freeze Table Name
-    freezeTableName: true
-  });
-   
-  // Export model Product
-  module.exports = { 
-    Task
+    freezeTableName: true,
   }
+);
+
+// Export model Product
+module.exports = {
+  Task,
+};
 
 // module.exports = (sequelize, DataTypes) => {
 //     const Task = sequelize.define('tasks', {

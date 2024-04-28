@@ -374,7 +374,24 @@ var Update = async function (req, res) {
       res.send(result);
     } else {
       sampleFile = req.files.image_task;
-      uploadPath = path.join(__dirname, "../public/uploads/", sampleFile.name);
+
+      const now = new Date();
+      const currentTime = `${now.getHours()}${now.getMinutes()}${now.getSeconds()}`;
+      const randomNumbers = Math.floor(10000 + Math.random() * 90000); // Generates a random number between 10000 and 99999
+
+      const uploadPath = path.join(
+        __dirname,
+        "../public/uploads",
+        `${randomNumbers}_${currentTime}_task.${sampleFile.name
+          .split(".")
+          .pop()}`
+      );
+
+      const imagePath = `/uploads/${randomNumbers}_${currentTime}_task.${sampleFile.name
+        .split(".")
+        .pop()}`;
+
+      // uploadPath = path.join(__dirname, "../public/uploads/", sampleFile.name);
 
       futil.logger.debug(
         "\n" +
@@ -388,8 +405,9 @@ var Update = async function (req, res) {
 
         // res.send('File uploaded!');
 
-        req.body.path = uploadPath;
+        req.body.path = imagePath;
         req.body.filename = sampleFile.name;
+        req.body.desc = req.body.desc || "";
 
         futil.logger.debug(
           "\n" +
