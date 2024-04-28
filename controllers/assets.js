@@ -1,666 +1,979 @@
-var axios = require('axios')
-var util = require('util');
-var futil = require('../config/utility.js');
-const {Client} = require("@googlemaps/google-maps-services-js");
+var axios = require("axios");
+var util = require("util");
+var futil = require("../config/utility.js");
+const { Client } = require("@googlemaps/google-maps-services-js");
 
-require('dotenv').config();
+var ModelVehicle = require("../models/vehicle.js");
+const { where } = require("sequelize");
+var Vehicle = ModelVehicle.Vehicle;
 
-var AssetByID = async function(req,res){
+require("dotenv").config();
 
-  var access_token = process.env.TOKEN_AERTRAK
-  var url_assets = process.env.URL_ASSET_AERTRACK + '/' + req.params.sclId
+var AssetByID = async function (req, res) {
+  var access_token = process.env.TOKEN_AERTRAK;
+  var url_assets = process.env.URL_ASSET_AERTRACK + "/" + req.params.sclId;
 
-  futil.logger.debug('\n' + futil.shtm() + '- [ ASSETS ] | INFO ' + util.inspect('ASSETS'));  
-  futil.logger.debug('\n' + futil.shtm() + '- [ URL ASSETS ] | INFO ' + util.inspect(url_assets)); 
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ ASSETS ] | INFO " + util.inspect("ASSETS")
+  );
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ URL ASSETS ] | INFO " + util.inspect(url_assets)
+  );
 
   const config = {
-      headers:{
-          token : access_token
-      }
-    }
-    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADER] | INFO ' + util.inspect(config)); 
+    headers: {
+      token: access_token,
+    },
+  };
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ REQUEST HEADER] | INFO " + util.inspect(config)
+  );
 
-    await axios.get(url_assets,config)
+  await axios
+    .get(url_assets, config)
     .then(function (response_assets) {
-       // console.log(response_assets.data)
-       futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response_assets.data)); 
-           var result = {
-           "status":true,
-           "message":"success",
-           "data": response_assets.data
-       }
+      // console.log(response_assets.data)
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ RESPONSE BODY] | INFO " +
+          util.inspect(response_assets.data)
+      );
+      var result = {
+        status: true,
+        message: "success",
+        data: response_assets.data,
+      };
 
-       res.setHeader("Content-Type", "application/json");
-       res.writeHead(200);
-       res.end(JSON.stringify(result));
-
-    }) 
-    .catch(function (error) {
-       if (error.response) {
-           // The request was made and the server responded with a status code
-           // that falls out of the range of 2xx
-           futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-           futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-           futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-           // console.log(error.response.data);
-           // console.log(error.response.status);
-           // console.log(error.response.headers);
-         } else if (error.request) {
-           // The request was made but no response was received
-           // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-           // http.ClientRequest in node.js
-           futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-           // console.log(error.request);
-         } else {
-           // Something happened in setting up the request that triggered an Error
-           // console.log('Error', error.message);
-           futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-         }
-         futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
-
-         var result = {  
-
-           "status":false,
-           "message": 'ERROR CONNECTION'
-       }
-       res.setHeader("Content-Type", "application/json");
-       res.writeHead(400);
-       res.end(JSON.stringify(result,null,3));
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(200);
+      res.end(JSON.stringify(result));
     })
-
-  
-}
-
-var AllAssets = async function(req,res){
- 
-
-        var access_token = process.env.TOKEN_AERTRAK
-        var url_assets = process.env.URL_ASSET_AERTRACK
-
-        futil.logger.debug('\n' + futil.shtm() + '- [ ASSETS ] | INFO ' + util.inspect('ASSETS'));  
-        futil.logger.debug('\n' + futil.shtm() + '- [ URL ASSETS ] | INFO ' + util.inspect(url_assets)); 
-
-        const config = {
-            headers:{
-                token : access_token
-            }
-          }
-
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADER] | INFO ' + util.inspect(config)); 
-
-        await axios.get(url_assets,config)
-         .then(function (response_assets) {
-            // console.log(response_assets.data)
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response_assets.data)); 
-                var result = {
-                "status":true,
-                "message":"success",
-                "data": response_assets.data
-            }
-
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(200);
-            res.end(JSON.stringify(result));
-
-         }) 
-         .catch(function (error) {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-                // console.log(error.response.data);
-                // console.log(error.response.status);
-                // console.log(error.response.headers);
-              } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-                // console.log(error.request);
-              } else {
-                // Something happened in setting up the request that triggered an Error
-                // console.log('Error', error.message);
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-              }
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
-
-              var result = {  
-
-                "status":false,
-                "message": 'ERROR CONNECTION'
-            }
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(400);
-            res.end(JSON.stringify(result,null,3));
-         })
-
-       
-
-
- }
-
-
- var AllAssets1 = async function(req,res){
-    
-    var moving_counter = 0
-    var stopped_counter = 0
-    var offline_counter = 0
-
-    var access_token = process.env.TOKEN_AERTRAK
-    var url_assets = process.env.URL_ASSET_AERTRACK
-
-    futil.logger.debug('\n' + futil.shtm() + '- [ ASSETS ] | INFO ' + util.inspect('ASSETS'));  
-    futil.logger.debug('\n' + futil.shtm() + '- [ URL ASSETS ] | INFO ' + util.inspect(url_assets)); 
-
-    const config = {
-        headers:{
-            token : access_token
-        }
+    .catch(function (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE DATA ]  " +
+            util.inspect(error.response.data)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE STATUS ]  " +
+            util.inspect(error.response.status)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE HEADER ]  " +
+            util.inspect(error.response.headers)
+        );
+        // console.log(error.response.data);
+        // console.log(error.response.status);
+        // console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR REQUEST ]  " +
+            util.inspect(error.request)
+        );
+        // console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.log('Error', error.message);
+        futil.logger.debug(
+          "\n" + futil.shtm() + "- [ ERROR ]  " + util.inspect(error.message)
+        );
       }
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ ERROR CONFIG]  " + util.inspect(error.config)
+      );
 
-    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADER] | INFO ' + util.inspect(config)); 
+      var result = {
+        status: false,
+        message: "ERROR CONNECTION",
+      };
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(400);
+      res.end(JSON.stringify(result, null, 3));
+    });
+};
 
-   let res1 = await axios.get(url_assets,config)
+var AllAssets = async function (req, res) {
+  var access_token = process.env.TOKEN_AERTRAK;
+  var url_assets = process.env.URL_ASSET_AERTRACK;
 
-     .then(function (response_assets) {
-        // console.log(response_assets.data)
-        futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response_assets.data)); 
-        //     var result = {
-        //     "status":true,
-        //     "message":"success",
-        //     "data": response_assets.data
-        // }
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ ASSETS ] | INFO " + util.inspect("ASSETS")
+  );
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ URL ASSETS ] | INFO " + util.inspect(url_assets)
+  );
 
-        // res.setHeader("Content-Type", "application/json");
-        // res.writeHead(200);
-        // res.end(JSON.stringify(result));
-        return response_assets.data
-     }) 
-     .catch(function (error) {
+  const config = {
+    headers: {
+      token: access_token,
+    },
+  };
+
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ REQUEST HEADER] | INFO " + util.inspect(config)
+  );
+
+  await axios
+    .get(url_assets, config)
+    .then(function (response_assets) {
+      // console.log(response_assets.data)
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ RESPONSE BODY] | INFO " +
+          util.inspect(response_assets.data)
+      );
+      var result = {
+        status: true,
+        message: "success",
+        data: response_assets.data,
+      };
+
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(200);
+      res.end(JSON.stringify(result));
+    })
+    .catch(function (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE DATA ]  " +
+            util.inspect(error.response.data)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE STATUS ]  " +
+            util.inspect(error.response.status)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE HEADER ]  " +
+            util.inspect(error.response.headers)
+        );
+        // console.log(error.response.data);
+        // console.log(error.response.status);
+        // console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR REQUEST ]  " +
+            util.inspect(error.request)
+        );
+        // console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.log('Error', error.message);
+        futil.logger.debug(
+          "\n" + futil.shtm() + "- [ ERROR ]  " + util.inspect(error.message)
+        );
+      }
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ ERROR CONFIG]  " + util.inspect(error.config)
+      );
+
+      var result = {
+        status: false,
+        message: "ERROR CONNECTION",
+      };
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(400);
+      res.end(JSON.stringify(result, null, 3));
+    });
+};
+
+var AllAssets1 = async function (req, res) {
+  var moving_counter = 0;
+  var stopped_counter = 0;
+  var offline_counter = 0;
+
+  var access_token = process.env.TOKEN_AERTRAK;
+  var url_assets = process.env.URL_ASSET_AERTRACK;
+
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ ASSETS ] | INFO " + util.inspect("ASSETS")
+  );
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ URL ASSETS ] | INFO " + util.inspect(url_assets)
+  );
+
+  const config = {
+    headers: {
+      token: access_token,
+    },
+  };
+
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ REQUEST HEADER] | INFO " + util.inspect(config)
+  );
+
+  let res1 = await axios
+    .get(url_assets, config)
+
+    .then(function (response_assets) {
+      // console.log(response_assets.data)
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ RESPONSE BODY] | INFO " +
+          util.inspect(response_assets.data)
+      );
+      //     var result = {
+      //     "status":true,
+      //     "message":"success",
+      //     "data": response_assets.data
+      // }
+
+      // res.setHeader("Content-Type", "application/json");
+      // res.writeHead(200);
+      // res.end(JSON.stringify(result));
+      return response_assets.data;
+    })
+    .catch(function (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE DATA ]  " +
+            util.inspect(error.response.data)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE STATUS ]  " +
+            util.inspect(error.response.status)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE HEADER ]  " +
+            util.inspect(error.response.headers)
+        );
+        // console.log(error.response.data);
+        // console.log(error.response.status);
+        // console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR REQUEST ]  " +
+            util.inspect(error.request)
+        );
+        // console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.log('Error', error.message);
+        futil.logger.debug(
+          "\n" + futil.shtm() + "- [ ERROR ]  " + util.inspect(error.message)
+        );
+      }
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ ERROR CONFIG]  " + util.inspect(error.config)
+      );
+
+      var result = {
+        status: false,
+        message: "ERROR CONNECTION",
+      };
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(400);
+      res.end(JSON.stringify(result, null, 3));
+    });
+
+  //  console.log(res1.length)
+
+  for (j = 0; j <= res1.length - 1; j++) {
+    var url_latest_status =
+      process.env.URL_LATEST_STATUS_AERTRACK +
+      "accountId=" +
+      res1[j].accountId +
+      "&includeHierarchy =false&sclId=" +
+      res1[j].sclId;
+    // console.log(url_latest_status)
+
+    let res2 = await axios
+      .get(url_latest_status, config)
+      .then(function (response_latest_status) {
+        //console.log(response_latest_status.data[0])
+        var deviceStatus = response_latest_status.data[0].deviceStatus;
+        return deviceStatus;
+      })
+      .catch(function (error) {
         if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-            futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-            futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-            // console.log(error.response.data);
-            // console.log(error.response.status);
-            // console.log(error.response.headers);
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-            // console.log(error.request);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            // console.log('Error', error.message);
-            futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-          }
-          futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
-
-          var result = {  
-
-            "status":false,
-            "message": 'ERROR CONNECTION'
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          futil.logger.debug(
+            "\n" +
+              futil.shtm() +
+              "- [ ERROR RESPONSE DATA ]  " +
+              util.inspect(error.response.data)
+          );
+          futil.logger.debug(
+            "\n" +
+              futil.shtm() +
+              "- [ ERROR RESPONSE STATUS ]  " +
+              util.inspect(error.response.status)
+          );
+          futil.logger.debug(
+            "\n" +
+              futil.shtm() +
+              "- [ ERROR RESPONSE HEADER ]  " +
+              util.inspect(error.response.headers)
+          );
+          // console.log(error.response.data);
+          // console.log(error.response.status);
+          // console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          futil.logger.debug(
+            "\n" +
+              futil.shtm() +
+              "- [ ERROR REQUEST ]  " +
+              util.inspect(error.request)
+          );
+          // console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          // console.log('Error', error.message);
+          futil.logger.debug(
+            "\n" + futil.shtm() + "- [ ERROR ]  " + util.inspect(error.message)
+          );
         }
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR CONFIG]  " +
+            util.inspect(error.config)
+        );
+
+        var result = {
+          status: false,
+          message: "ERROR CONNECTION",
+        };
         res.setHeader("Content-Type", "application/json");
         res.writeHead(400);
-        res.end(JSON.stringify(result,null,3));
-     })
+        res.end(JSON.stringify(result, null, 3));
+      });
 
-    //  console.log(res1.length)
-
-     for (j=0;j<= res1.length-1;j++)
-     {
-        var url_latest_status = process.env.URL_LATEST_STATUS_AERTRACK +'accountId='+ res1[j].accountId +'&includeHierarchy =false&sclId='+ res1[j].sclId ;
-        // console.log(url_latest_status)
-
-        let res2 = await axios.get(url_latest_status,config)
-        .then(function (response_latest_status) {
-            //console.log(response_latest_status.data[0])
-            var deviceStatus = response_latest_status.data[0].deviceStatus
-            return deviceStatus
-        }).catch(function (error) {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-                // console.log(error.response.data);
-                // console.log(error.response.status);
-                // console.log(error.response.headers);
-              } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-                // console.log(error.request);
-              } else {
-                // Something happened in setting up the request that triggered an Error
-                // console.log('Error', error.message);
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-              }
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
-    
-              var result = {  
-    
-                "status":false,
-                "message": 'ERROR CONNECTION'
-            }
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(400);
-            res.end(JSON.stringify(result,null,3));
-         })
-
-         if(res2 == 'moving'){
-            moving_counter++
-        }else if(res2 == 'stopped'){
-            stopped_counter++
-        }else if(res2 == 'offline'){
-            offline_counter++
-        }
-
-        res1[j].deviceStatus = res2
-     }
-    
-     futil.logger.debug('\n' + futil.shtm() + '- [ MOVING COUNTER] | INFO ' + util.inspect(moving_counter)); 
-     futil.logger.debug('\n' + futil.shtm() + '- [ STOPPED COUNTER] | INFO ' + util.inspect(stopped_counter)); 
-     futil.logger.debug('\n' + futil.shtm() + '- [ OFFLINE COUNTER ] | INFO ' + util.inspect(offline_counter)); 
-
-     futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(res1)); 
-     var result = {
-     "status":true,
-     "message":"success",
-     "data": res1
+    if (res2 == "moving") {
+      moving_counter++;
+    } else if (res2 == "stopped") {
+      stopped_counter++;
+    } else if (res2 == "offline") {
+      offline_counter++;
     }
 
-    res.setHeader("Content-Type", "application/json");
-    res.writeHead(200);
-    res.end(JSON.stringify(result));
-}
+    res1[j].deviceStatus = res2;
+  }
 
-var LatestStatus = async function(req,res){
+  futil.logger.debug(
+    "\n" +
+      futil.shtm() +
+      "- [ MOVING COUNTER] | INFO " +
+      util.inspect(moving_counter)
+  );
+  futil.logger.debug(
+    "\n" +
+      futil.shtm() +
+      "- [ STOPPED COUNTER] | INFO " +
+      util.inspect(stopped_counter)
+  );
+  futil.logger.debug(
+    "\n" +
+      futil.shtm() +
+      "- [ OFFLINE COUNTER ] | INFO " +
+      util.inspect(offline_counter)
+  );
 
-        var access_token = process.env.TOKEN_AERTRAK
-        var accountId = process.env.ACCOUNTID
-        var sclId = req.params.sclId
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ RESPONSE BODY] | INFO " + util.inspect(res1)
+  );
+  var result = {
+    status: true,
+    message: "success",
+    data: res1,
+  };
 
-        var url_latest_status = process.env.URL_LATEST_STATUS_AERTRACK +'accountId='+ accountId +'&includeHierarchy =false&sclId='+ sclId ;
+  res.setHeader("Content-Type", "application/json");
+  res.writeHead(200);
+  res.end(JSON.stringify(result));
+};
 
-        futil.logger.debug('\n' + futil.shtm() + '- [ ASSETS LATEST STATUS ] | INFO ');  
-        futil.logger.debug('\n' + futil.shtm() + '- [ URL ASSETS LATEST STATUS ] | INFO ' + util.inspect(url_latest_status)); 
+var LatestStatus = async function (req, res) {
+  var access_token = process.env.TOKEN_AERTRAK;
+  var accountId = process.env.ACCOUNTID;
+  var sclId = req.params.sclId;
 
-        const config = {
-            headers:{
-                token : access_token
-            }
-          }
+  var url_latest_status =
+    process.env.URL_LATEST_STATUS_AERTRACK +
+    "accountId=" +
+    accountId +
+    "&includeHierarchy =false&sclId=" +
+    sclId;
 
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADER] | INFO ' + util.inspect(config)); 
-        
-        await axios.get(url_latest_status,config)
-        .then(function (response_latest_status) {
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ ASSETS LATEST STATUS ] | INFO "
+  );
+  futil.logger.debug(
+    "\n" +
+      futil.shtm() +
+      "- [ URL ASSETS LATEST STATUS ] | INFO " +
+      util.inspect(url_latest_status)
+  );
 
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response_latest_status.data)); 
-            var result = {
-                "status":true,
-                "message":"success",
-                "data": response_latest_status.data
-            }
+  const config = {
+    headers: {
+      token: access_token,
+    },
+  };
 
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE RESULT] | INFO ' + util.inspect(result)); 
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ REQUEST HEADER] | INFO " + util.inspect(config)
+  );
 
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(200);
-            res.end(JSON.stringify(result));
+  const odometerData = await Vehicle.findOne({
+    where: { vehicleSclId: sclId },
+    attributes: ["init_odometer"],
+  });
 
-        }).catch(function (error) {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-                // console.log(error.response.data);
-                // console.log(error.response.status);
-                // console.log(error.response.headers);
-              } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-                // console.log(error.request);
-              } else {
-                // Something happened in setting up the request that triggered an Error
-                // console.log('Error', error.message);
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-              }
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
+  await axios
+    .get(url_latest_status, config)
+    .then(async function (response_latest_status) {
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ RESPONSE BODY] | INFO " +
+          util.inspect(response_latest_status.data)
+      );
 
-              var result = {  
+      response_latest_status.data.forEach((item, index) => {
+        // Assign odometerData to each item in the list
+        item.odometerData = odometerData;
+      });
 
-                "status":false,
-                "message": 'ERROR CONNECTION'
-            }
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(400);
-            res.end(JSON.stringify(result,null,3));
-         })
+      var result = {
+        status: true,
+        message: "Success",
+        data: response_latest_status.data,
+      };
 
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ RESPONSE RESULT] | INFO " +
+          util.inspect(result)
+      );
 
-}
-
-
-
-var LatestStatus1 = async function(req,res){
-    var access_token = process.env.TOKEN_AERTRAK
-    var accountId = process.env.ACCOUNTID
-    var url_latest_status = process.env.URL_LATEST_STATUS_AERTRACK +'accountId='+ accountId +'&includeHierarchy =false'
-
-    futil.logger.debug('\n' + futil.shtm() + '- [ ASSETS LATEST STATUS ] | INFO ');  
-    futil.logger.debug('\n' + futil.shtm() + '- [ URL ASSETS LATEST STATUS ] | INFO ' + util.inspect(url_latest_status)); 
-
-    const config = {
-        headers:{
-            token : access_token
-        }
-      }
-
-    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADER] | INFO ' + util.inspect(config)); 
-    let res1 = await axios.get(url_latest_status,config)
-        .then(function (response) {
-
-            
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response.data)); 
-            var result = {
-                "status":true,
-                "message":"success",
-                "data": response.data
-            }
-
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(200);
-            res.end(JSON.stringify(result));
-
-            // return response.data
-
-        }).catch(function (error) {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-                // console.log(error.response.data);
-                // console.log(error.response.status);
-                // console.log(error.response.headers);
-              } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-                // console.log(error.request);
-              } else {
-                // Something happened in setting up the request that triggered an Error
-                // console.log('Error', error.message);
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-              }
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
-
-              var result = {  
-
-                "status":false,
-                "message": 'ERROR CONNECTION'
-            }
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(400);
-            res.end(JSON.stringify(result,null,3));
-         })
-
-       
-         
-
-        //  var apiKey = process.env.MAP_KEY
-
-        //  for(i=0;i<=res1.length-1;i++){
-        //     var lat = res1[i].validLatitude
-        //     var lng = res1[i].validLongitude
-        //     if(!lat && !lng){
-        //         futil.logger.debug('\n' + futil.shtm() + '- [ ERROR LOCATION]  ' );
-        //     }else{
-        //         let res2 = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`)
-        //         .then(response => {
-        //             // console.log(response.data.results[0].formatted_address);
-        //             // console.log(res1[i])
-                    
-        //             futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response)); 
-        //             return response.data.results[0].formatted_address
-                   
-        //         })
-        //         .catch(error => {
-        //             console.log(error);
-        //         })
-
-        //         res1[i].validAddress = res2
-        //     }
-            
-        //     // break;
-        //  }
-
-        // //  console.log(res1)
-
-        // futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(res1)); 
-        // var result = {
-        // "status":true,
-        // "message":"success",
-        // "data": res1
-        //  }
-
-        // res.setHeader("Content-Type", "application/json");
-        // res.writeHead(200);
-        // res.end(JSON.stringify(result));
-
-
-}
-
-var AssetAddress = async function(req,res) {
-    var lat = req.params.lat
-    var lng = req.params.lng
-    var apiKey = process.env.MAP_KEY
-
-    await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`)
-    .then(response => {
-                    futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response)); 
-                    var validAddress = response.data.results[0].formatted_address
-                    
-                    var result = {
-                    "status":true,
-                    "message":"success",
-                    "data": validAddress
-                     }
-
-                    res.setHeader("Content-Type", "application/json");
-                    res.writeHead(200);
-                    res.end(JSON.stringify(result));
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(200);
+      res.end(JSON.stringify(result));
     })
-    .catch(error => {
-            console.log(error);
-            futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ] | INFO ' + util.inspect(error)); 
-                                
-            var result = {
-                "status":false,
-                "message":"failed"
-                 }
-
-                res.setHeader("Content-Type", "application/json");
-                res.writeHead(400);
-                res.end(JSON.stringify(result));
-     })
-}
-
-var History = async function(req,res){
-
-    var token = process.env.TOKEN_AERTRAK
-    var sclId = req.body.sclId
-    var createdBefore = req.body.createdBefore
-    var createdAfter = req.body.createdAfter
-    // var limit = req.body.limit
-    var accountId = process.env.ACCOUNTID
-
-
-    // var url_history = process.env.URL_ASSET_HISTORY + sclId + "/data?createdBefore="+ createdBefore + "&createdAfter="+ createdAfter +"&accountId="+ accountId +"&limit="+ limit +"&count=true"
-    var url_history = process.env.URL_ASSET_HISTORY + sclId + "/data?createdBefore="+ createdBefore + "&createdAfter="+ createdAfter +"&accountId="+ accountId 
-
-    futil.logger.debug('\n' + futil.shtm() + '- [ ASSETS HISTORY ] | INFO ' );  
-    futil.logger.debug('\n' + futil.shtm() + '- [ URL ASSETS HISTORY ] | INFO ' + util.inspect(url_history));
-    
-    const config = {
-      headers:{
-          token : token
+    .catch(function (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE DATA ]  " +
+            util.inspect(error.response.data)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE STATUS ]  " +
+            util.inspect(error.response.status)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE HEADER ]  " +
+            util.inspect(error.response.headers)
+        );
+        // console.log(error.response.data);
+        // console.log(error.response.status);
+        // console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR REQUEST ]  " +
+            util.inspect(error.request)
+        );
+        // console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.log('Error', error.message);
+        futil.logger.debug(
+          "\n" + futil.shtm() + "- [ ERROR ]  " + util.inspect(error.message)
+        );
       }
-    }
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ ERROR CONFIG]  " + util.inspect(error.config)
+      );
 
-    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADER] | INFO ' + util.inspect(config)); 
+      var result = {
+        status: false,
+        message: "ERROR CONNECTION",
+      };
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(400);
+      res.end(JSON.stringify(result, null, 3));
+    });
+};
 
-    axios.get(url_history,config)
-         .then(function (response_assets) {
-          futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response_assets.data)); 
+var LatestStatus1 = async function (req, res) {
+  var access_token = process.env.TOKEN_AERTRAK;
+  var accountId = process.env.ACCOUNTID;
+  var url_latest_status =
+    process.env.URL_LATEST_STATUS_AERTRACK +
+    "accountId=" +
+    accountId +
+    "&includeHierarchy =false";
 
-          // var j= 1
-          var data = response_assets.data
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ ASSETS LATEST STATUS ] | INFO "
+  );
+  futil.logger.debug(
+    "\n" +
+      futil.shtm() +
+      "- [ URL ASSETS LATEST STATUS ] | INFO " +
+      util.inspect(url_latest_status)
+  );
 
+  const config = {
+    headers: {
+      token: access_token,
+    },
+  };
 
-          // for (i=0;i<= data.length-1;i++){
-          //   data[i].no = j
-          //   data[i].speed = data[i].speed /1000
-          //   j++
-          // }
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ REQUEST HEADER] | INFO " + util.inspect(config)
+  );
+  let res1 = await axios
+    .get(url_latest_status, config)
+    .then(function (response) {
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ RESPONSE BODY] | INFO " +
+          util.inspect(response.data)
+      );
+      var result = {
+        status: true,
+        message: "success",
+        data: response.data,
+      };
 
-          var result = {
-            "status":true,
-            "message":"success",
-            "data": data
-          }
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(200);
+      res.end(JSON.stringify(result));
 
-          res.setHeader("Content-Type", "application/json");
-          res.writeHead(200);
-          res.end(JSON.stringify(result));
+      // return response.data
+    })
+    .catch(function (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE DATA ]  " +
+            util.inspect(error.response.data)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE STATUS ]  " +
+            util.inspect(error.response.status)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE HEADER ]  " +
+            util.inspect(error.response.headers)
+        );
+        // console.log(error.response.data);
+        // console.log(error.response.status);
+        // console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR REQUEST ]  " +
+            util.inspect(error.request)
+        );
+        // console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.log('Error', error.message);
+        futil.logger.debug(
+          "\n" + futil.shtm() + "- [ ERROR ]  " + util.inspect(error.message)
+        );
+      }
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ ERROR CONFIG]  " + util.inspect(error.config)
+      );
 
-         }).catch(function (error) {
-          if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-              // console.log(error.response.data);
-              // console.log(error.response.status);
-              // console.log(error.response.headers);
-            } else if (error.request) {
-              // The request was made but no response was received
-              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-              // http.ClientRequest in node.js
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-              // console.log(error.request);
-            } else {
-              // Something happened in setting up the request that triggered an Error
-              // console.log('Error', error.message);
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-            }
-            futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
+      var result = {
+        status: false,
+        message: "ERROR CONNECTION",
+      };
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(400);
+      res.end(JSON.stringify(result, null, 3));
+    });
 
-            var result = {  
+  //  var apiKey = process.env.MAP_KEY
 
-              "status":false,
-              "message": 'ERROR CONNECTION'
-          }
-          res.setHeader("Content-Type", "application/json");
-          res.writeHead(400);
-          res.end(JSON.stringify(result,null,3));
-       })
+  //  for(i=0;i<=res1.length-1;i++){
+  //     var lat = res1[i].validLatitude
+  //     var lng = res1[i].validLongitude
+  //     if(!lat && !lng){
+  //         futil.logger.debug('\n' + futil.shtm() + '- [ ERROR LOCATION]  ' );
+  //     }else{
+  //         let res2 = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`)
+  //         .then(response => {
+  //             // console.log(response.data.results[0].formatted_address);
+  //             // console.log(res1[i])
 
-}
+  //             futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response));
+  //             return response.data.results[0].formatted_address
 
-var StatusCount = async function(req,res){
+  //         })
+  //         .catch(error => {
+  //             console.log(error);
+  //         })
 
-    var url_status_count = process.env.URL_STATUS_COUNT_AERTRACK;
-    var token = process.env.TOKEN_AERTRAK
+  //         res1[i].validAddress = res2
+  //     }
 
+  //     // break;
+  //  }
 
-    futil.logger.debug('\n' + futil.shtm() + '- [ ASSETS STATUS COUNT ] | INFO ' );  
-        futil.logger.debug('\n' + futil.shtm() + '- [ URL ASSETS COUNT ] | INFO ' + util.inspect(url_status_count)); 
+  // //  console.log(res1)
 
-        const config = {
-            headers:{
-                token : token
-            }
-          }
+  // futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(res1));
+  // var result = {
+  // "status":true,
+  // "message":"success",
+  // "data": res1
+  //  }
 
-        futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADER] | INFO ' + util.inspect(config)); 
+  // res.setHeader("Content-Type", "application/json");
+  // res.writeHead(200);
+  // res.end(JSON.stringify(result));
+};
 
-        axios.get(url_status_count,config)
-         .then(function (response_assets) {
-            // console.log(response_assets.data)
-            futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE BODY] | INFO ' + util.inspect(response_assets.data)); 
-                var result = {
-                "status":true,
-                "message":"success",
-                "data": response_assets.data
-            }
+var AssetAddress = async function (req, res) {
+  var lat = req.params.lat;
+  var lng = req.params.lng;
+  var apiKey = process.env.MAP_KEY;
 
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(200);
-            res.end(JSON.stringify(result));
+  await axios
+    .get(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`
+    )
+    .then((response) => {
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ RESPONSE BODY] | INFO " +
+          util.inspect(response)
+      );
+      var validAddress = response.data.results[0].formatted_address;
 
-         }) 
-         .catch(function (error) {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-                // console.log(error.response.data);
-                // console.log(error.response.status);
-                // console.log(error.response.headers);
-              } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-                // console.log(error.request);
-              } else {
-                // Something happened in setting up the request that triggered an Error
-                // console.log('Error', error.message);
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-              }
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
+      var result = {
+        status: true,
+        message: "success",
+        data: validAddress,
+      };
 
-              var result = {  
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(200);
+      res.end(JSON.stringify(result));
+    })
+    .catch((error) => {
+      console.log(error);
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ ERROR ] | INFO " + util.inspect(error)
+      );
 
-                "status":false,
-                "message": 'ERROR CONNECTION'
-            }
-            res.setHeader("Content-Type", "application/json");
-            res.writeHead(400);
-            res.end(JSON.stringify(result,null,3));
-         })
+      var result = {
+        status: false,
+        message: "failed",
+      };
 
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(400);
+      res.end(JSON.stringify(result));
+    });
+};
 
-  
-}
+var History = async function (req, res) {
+  var token = process.env.TOKEN_AERTRAK;
+  var sclId = req.body.sclId;
+  var createdBefore = req.body.createdBefore;
+  var createdAfter = req.body.createdAfter;
+  // var limit = req.body.limit
+  var accountId = process.env.ACCOUNTID;
+
+  // var url_history = process.env.URL_ASSET_HISTORY + sclId + "/data?createdBefore="+ createdBefore + "&createdAfter="+ createdAfter +"&accountId="+ accountId +"&limit="+ limit +"&count=true"
+  var url_history =
+    process.env.URL_ASSET_HISTORY +
+    sclId +
+    "/data?createdBefore=" +
+    createdBefore +
+    "&createdAfter=" +
+    createdAfter +
+    "&accountId=" +
+    accountId;
+
+  futil.logger.debug("\n" + futil.shtm() + "- [ ASSETS HISTORY ] | INFO ");
+  futil.logger.debug(
+    "\n" +
+      futil.shtm() +
+      "- [ URL ASSETS HISTORY ] | INFO " +
+      util.inspect(url_history)
+  );
+
+  const config = {
+    headers: {
+      token: token,
+    },
+  };
+
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ REQUEST HEADER] | INFO " + util.inspect(config)
+  );
+
+  axios
+    .get(url_history, config)
+    .then(function (response_assets) {
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ RESPONSE BODY] | INFO " +
+          util.inspect(response_assets.data)
+      );
+
+      // var j= 1
+      var data = response_assets.data;
+
+      // for (i=0;i<= data.length-1;i++){
+      //   data[i].no = j
+      //   data[i].speed = data[i].speed /1000
+      //   j++
+      // }
+
+      var result = {
+        status: true,
+        message: "success",
+        data: data,
+      };
+
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(200);
+      res.end(JSON.stringify(result));
+    })
+    .catch(function (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE DATA ]  " +
+            util.inspect(error.response.data)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE STATUS ]  " +
+            util.inspect(error.response.status)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE HEADER ]  " +
+            util.inspect(error.response.headers)
+        );
+        // console.log(error.response.data);
+        // console.log(error.response.status);
+        // console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR REQUEST ]  " +
+            util.inspect(error.request)
+        );
+        // console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.log('Error', error.message);
+        futil.logger.debug(
+          "\n" + futil.shtm() + "- [ ERROR ]  " + util.inspect(error.message)
+        );
+      }
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ ERROR CONFIG]  " + util.inspect(error.config)
+      );
+
+      var result = {
+        status: false,
+        message: "ERROR CONNECTION",
+      };
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(400);
+      res.end(JSON.stringify(result, null, 3));
+    });
+};
+
+var StatusCount = async function (req, res) {
+  var url_status_count = process.env.URL_STATUS_COUNT_AERTRACK;
+  var token = process.env.TOKEN_AERTRAK;
+
+  futil.logger.debug("\n" + futil.shtm() + "- [ ASSETS STATUS COUNT ] | INFO ");
+  futil.logger.debug(
+    "\n" +
+      futil.shtm() +
+      "- [ URL ASSETS COUNT ] | INFO " +
+      util.inspect(url_status_count)
+  );
+
+  const config = {
+    headers: {
+      token: token,
+    },
+  };
+
+  futil.logger.debug(
+    "\n" + futil.shtm() + "- [ REQUEST HEADER] | INFO " + util.inspect(config)
+  );
+
+  axios
+    .get(url_status_count, config)
+    .then(function (response_assets) {
+      // console.log(response_assets.data)
+      futil.logger.debug(
+        "\n" +
+          futil.shtm() +
+          "- [ RESPONSE BODY] | INFO " +
+          util.inspect(response_assets.data)
+      );
+      var result = {
+        status: true,
+        message: "success",
+        data: response_assets.data,
+      };
+
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(200);
+      res.end(JSON.stringify(result));
+    })
+    .catch(function (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE DATA ]  " +
+            util.inspect(error.response.data)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE STATUS ]  " +
+            util.inspect(error.response.status)
+        );
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR RESPONSE HEADER ]  " +
+            util.inspect(error.response.headers)
+        );
+        // console.log(error.response.data);
+        // console.log(error.response.status);
+        // console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        futil.logger.debug(
+          "\n" +
+            futil.shtm() +
+            "- [ ERROR REQUEST ]  " +
+            util.inspect(error.request)
+        );
+        // console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.log('Error', error.message);
+        futil.logger.debug(
+          "\n" + futil.shtm() + "- [ ERROR ]  " + util.inspect(error.message)
+        );
+      }
+      futil.logger.debug(
+        "\n" + futil.shtm() + "- [ ERROR CONFIG]  " + util.inspect(error.config)
+      );
+
+      var result = {
+        status: false,
+        message: "ERROR CONNECTION",
+      };
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(400);
+      res.end(JSON.stringify(result, null, 3));
+    });
+};
 
 module.exports = {
-    AssetByID,
-    AllAssets,
-    AllAssets1,
-    AssetAddress,
-    LatestStatus,
-    LatestStatus1,
-    StatusCount,
-    History
- }
+  AssetByID,
+  AllAssets,
+  AllAssets1,
+  AssetAddress,
+  LatestStatus,
+  LatestStatus1,
+  StatusCount,
+  History,
+};
