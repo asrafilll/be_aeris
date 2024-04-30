@@ -54,6 +54,7 @@ const GetHistory = async (req, res) => {
         createdAt: {
           [Op.between]: [startDate, endDate],
         },
+        vehicleId: req.query.vehicleId,
         type: "geofence",
       },
       order: [["createdAt", "DESC"]],
