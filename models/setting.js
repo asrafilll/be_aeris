@@ -12,9 +12,12 @@ const Setting = con.db.define(
     // Define attributes
     key: {
       type: DataTypes.STRING,
+      primaryKey: true,
+      allowNull: false,
     },
     value: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
   },
   {

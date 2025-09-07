@@ -6,38 +6,34 @@ var con = require("../config/database.js");
 const { DataTypes } = sequelize;
 
 // Define schema
-const Vehicle_User = con.db.define(
-  "vehicle_users",
+const WebhookWa = con.db.define(
+  "webhook_wa",
   {
     // Define attributes
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
     },
-    vehicleid: {
+    from: {
       type: DataTypes.STRING,
     },
-    userid: {
-      type: DataTypes.INTEGER,
-    },
-    sclid: {
+    message: {
       type: DataTypes.STRING,
+    },
+    file: {
+      type: DataTypes.STRING,
+    },
+    timestamp: {
+      type: DataTypes.DATE,
     },
   },
   {
     // Freeze Table Name
     freezeTableName: true,
-    indexes: [
-      {
-        unique: true,
-        fields: ['vehicleid', 'userid']
-      }
-    ]
   }
 );
 
-// Export model Product
+// Export model
 module.exports = {
-  Vehicle_User,
+  WebhookWa,
 };

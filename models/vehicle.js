@@ -10,6 +10,11 @@ const Vehicle = con.db.define(
   "vehicles",
   {
     // Define attributes
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     vehicleid: {
       type: DataTypes.STRING,
     },
@@ -20,6 +25,18 @@ const Vehicle = con.db.define(
       type: DataTypes.STRING,
     },
     vehicle_condition: {
+      type: DataTypes.STRING,
+    },
+    name: {
+      type: DataTypes.STRING,
+    },
+    vin: {
+      type: DataTypes.STRING,
+    },
+    license_plate: {
+      type: DataTypes.STRING,
+    },
+    deviceId: {
       type: DataTypes.STRING,
     },
     power_status: {
@@ -40,6 +57,9 @@ const Vehicle = con.db.define(
     assignment: {
       type: DataTypes.INTEGER,
     },
+    createdBy: {
+      type: DataTypes.INTEGER,
+    },
     simId: {
       type: DataTypes.STRING,
     },
@@ -49,9 +69,20 @@ const Vehicle = con.db.define(
     vehicleSclId: {
       type: DataTypes.STRING,
     },
-    // odometer:{
-    //     type:DataTypes.INTEGER
-    // }
+    dashcamId: {
+      type: DataTypes.STRING,
+    },
+    lastday_odometer: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    lastday_odometer_period: {
+      type: DataTypes.DATE,
+    },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
   },
   {
     // Freeze Table Name

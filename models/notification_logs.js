@@ -6,8 +6,8 @@ var con = require("../config/database.js");
 const { DataTypes } = sequelize;
 
 // Define schema
-const Notification = con.db.define(
-  "notifications",
+const NotificationLogs = con.db.define(
+  "notification_logs",
   {
     // Define attributes
     id: {
@@ -63,26 +63,14 @@ const Notification = con.db.define(
     speed: {
       type: DataTypes.STRING,
     },
-    is_send: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    address: {
-      type: DataTypes.TEXT,
-    },
   },
   {
     // Freeze Table Name
     freezeTableName: true,
-    indexes: [
-      {
-        fields: ['uId']
-      }
-    ]
   }
 );
 
-// Export model Product
+// Export model
 module.exports = {
-  Notification,
+  NotificationLogs,
 };

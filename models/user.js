@@ -14,23 +14,55 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING,
       },
-      email: {
-        type: DataTypes.STRING,
-      },
       level: {
         type: DataTypes.STRING,
       },
       ph_number: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(25),
       },
       area: {
+        type: DataTypes.STRING(25),
+      },
+      email: {
+        type: DataTypes.STRING,
+      },
+      createdBy: {
+        type: DataTypes.INTEGER,
+      },
+      parent_id: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
+      features: {
+        type: DataTypes.STRING,
+      },
+      alerts: {
         type: DataTypes.STRING,
       },
       image: {
         type: DataTypes.STRING,
       },
-      createdBy: {
+      npm: {
+        type: DataTypes.STRING,
+      },
+      jk: {
+        type: DataTypes.STRING,
+      },
+      tgl_lahir: {
+        type: DataTypes.DATEONLY,
+      },
+      mulai_tugas: {
         type: DataTypes.INTEGER,
+      },
+      satuan: {
+        type: DataTypes.STRING,
+      },
+      unit: {
+        type: DataTypes.STRING,
+      },
+      vehicle_tag: {
+        type: DataTypes.TEXT,
       },
     },
     {

@@ -97,14 +97,66 @@ var Login = async function(req,res){
         });
         
         futil.logger.debug('\n' + futil.shtm() + '- [ RESULT ] | QUERING ' + util.inspect(user));
-        // res.send(user);
         var data = user
 
         if (data.length>0){
-            var result = {
-                "status" : true,
-                "message": 'success',
-                "data"   : data
+            // Get vehicle information for the logged-in user
+            const userId = data[0].id;
+            
+            try {
+                // Import vehicle models
+                var ModelVehicleUser = require("../models/vehicle_user.js");
+                var VehicleUser = ModelVehicleUser.Vehicle_User;
+                var ModelVehicle = require("../models/vehicle.js");
+                var Vehicle = ModelVehicle.Vehicle;
+
+                // Find user's vehicle assignment
+                const vehicleAssignment = await VehicleUser.findOne({
+                    where: {
+                        userid: userId
+                    },
+                    order: [["createdAt", "DESC"]],
+                    raw: true
+                });
+
+                let vehicleInfo = null;
+                if (vehicleAssignment) {
+                    // Get vehicle details
+                    const vehicle = await Vehicle.findOne({
+                        where: {
+                            vehicleid: vehicleAssignment.vehicleid
+                        },
+                        attributes: ['vin', 'deviceId', 'vehicleSclId', 'dashcamId', 'vehicleid', 'name', 'license_plate'],
+                        raw: true
+                    });
+                    
+                    if (vehicle) {
+                        vehicleInfo = vehicle;
+                    }
+                }
+
+                // Add vehicle info to user data
+                const enhancedData = data.map(userData => ({
+                    ...userData,
+                    vehicle: vehicleInfo
+                }));
+
+                var result = {
+                    "status" : true,
+                    "message": 'success',
+                    "data"   : enhancedData
+                }
+                
+                futil.logger.debug('\n' + futil.shtm() + '- [ ENHANCED LOGIN RESULT ] | ' + util.inspect(result));
+                
+            } catch (vehicleError) {
+                futil.logger.debug('\n' + futil.shtm() + '- [ VEHICLE INFO ERROR ] | ' + util.inspect(vehicleError));
+                // If vehicle info fails, continue with original user data
+                var result = {
+                    "status" : true,
+                    "message": 'success',
+                    "data"   : data
+                }
             }
     
             const jwtKey = process.env.TOKEN_SECRET

@@ -6,8 +6,8 @@ var con = require("../config/database.js");
 const { DataTypes } = sequelize;
 
 // Define schema
-const Vehicle_User = con.db.define(
-  "vehicle_users",
+const TempVehicles = con.db.define(
+  "temp_vehicles",
   {
     // Define attributes
     id: {
@@ -15,29 +15,24 @@ const Vehicle_User = con.db.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    vehicleid: {
+    vehicleUid: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    place: {
       type: DataTypes.STRING,
     },
-    userid: {
-      type: DataTypes.INTEGER,
-    },
-    sclid: {
+    place_type: {
       type: DataTypes.STRING,
     },
   },
   {
     // Freeze Table Name
     freezeTableName: true,
-    indexes: [
-      {
-        unique: true,
-        fields: ['vehicleid', 'userid']
-      }
-    ]
   }
 );
 
-// Export model Product
+// Export model
 module.exports = {
-  Vehicle_User,
+  TempVehicles,
 };

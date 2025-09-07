@@ -2,7 +2,7 @@
 
 ## Instalasi Error
 
-Ketemu eror kayak gini wuakakakak
+Bila ketemu eror kayak gini
 
 ```
 ERROR 1049 (42000): Unknown database 'polisi'
@@ -15,6 +15,7 @@ ERROR 1049 (42000): Unknown database 'polisi'
 Sebelum impor file `.sql`, pastikan database `polisi` udah dibuat ya. Bisa kok bikin database lewat MySQL command line interface (CLI), gini caranya:
 
 1. Buka MySQL CLI:
+
    - Dari PowerShell atau Command Prompt, ketik aja:
      ```powershell
      mysql -u root -p
@@ -33,11 +34,13 @@ Sebelum impor file `.sql`, pastikan database `polisi` udah dibuat ya. Bisa kok b
 Habis database `polisi` berhasil dibuat, coba lagi proses impor pake PowerShell kayak tadi:
 
 Karena saya Sobat Windows jadi kek gini
+
 ```powershell
 Get-Content .\db_fleet.sql | mysql -u root -p polisi
 ```
 
 kalo saudara adalah sobat unix, jadi pake ini aja deh
+
 ```
 mysql -u root -p polisi < .\db_fleet.sql
 ```
@@ -84,27 +87,32 @@ npx sequelize-cli db:migrate
 
 Moga lancar cepet cair
 
-
 ## Bisnis Flow:
+
 1. User Management:
+
    - Aplikasi ini memiliki sistem manajemen user dengan tabel "users".
    - Setiap user memiliki username, password, level (administrator/petugas), nomor telepon, area, dan email.
    - User dapat dibuat oleh user lain (kemungkinan oleh admin) dilihat dari adanya kolom "createdBy".
 
 2. Manajemen Kendaraan:
+
    - Aplikasi ini mengelola data kendaraan dengan tabel "vehicles".
    - Setiap kendaraan memiliki detail seperti ID kendaraan, merek, tipe, kondisi, nama, VIN, plat nomor, ID perangkat, status daya, status pengapian, kecepatan, waktu operasi, penandaan (tagging), penugasan (assignment), dll.
    - Kendaraan dapat dihubungkan dengan user melalui tabel "vehicle_users".
 
 3. Pelacakan Lokasi Kendaraan:
+
    - Aplikasi ini melacak lokasi kendaraan menggunakan tabel "place_ins" dan "place_outs".
    - Setiap kali kendaraan masuk atau keluar dari suatu tempat, data tersebut dicatat dalam tabel-tabel ini, termasuk ID kendaraan, tempat, tanggal, dan waktu.
 
 4. Penugasan Pekerjaan:
+
    - Aplikasi ini mendukung penugasan pekerjaan menggunakan tabel "tasks".
    - Setiap tugas memiliki detail seperti deskripsi tugas, tanggal, waktu, alamat, koordinat (latitude/longitude), status, tipe, ID pengguna yang ditugaskan, koordinat pengguna, ID kendaraan yang terkait, koordinat kendaraan, deskripsi, file terkait, dll.
 
 5. Perawatan Kendaraan:
+
    - Aplikasi ini mengelola data perawatan kendaraan dengan tabel "vehicle_perawatan".
    - Setiap record perawatan mencakup nama perawatan, ID kendaraan, nomor plat, tanggal STNK, perpanjangan STNK, odometer, tipe kendaraan, dan informasi ban.
 
@@ -120,6 +128,7 @@ www.plantuml.com/plantuml/png/hPNFRjim3CRlVWejfwr03XtGIq_T3WE27HPWwteq68krjUYF8T
 ![UML Database](./UML%20Database.png "UML Database")
 
 Penjelasan hubungan antar tabel:
+
 - Tabel `User` memiliki hubungan dengan tabel `Vehicle` melalui kolom `createdBy`, yang menunjukkan bahwa setiap kendaraan dapat dibuat oleh seorang pengguna.
 - Tabel `Vehicle` memiliki hubungan dengan tabel `VehicleUser` melalui kolom `vehicleid`, yang menunjukkan bahwa setiap kendaraan dapat dihubungkan dengan satu atau beberapa pengguna.
 - Tabel `Vehicle` juga memiliki hubungan dengan tabel `PlaceIn` dan `PlaceOut` melalui kolom `vehicleUid`, yang menunjukkan catatan masuk dan keluar kendaraan dari suatu tempat.

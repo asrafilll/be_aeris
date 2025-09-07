@@ -10,17 +10,22 @@ const Task = con.db.define(
   "tasks",
   {
     // Define attributes
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     task: {
       type: DataTypes.STRING,
     },
     task_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
     },
     task_time: {
       type: DataTypes.TIME,
     },
     task_address: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
     task_lat: {
       type: DataTypes.STRING,
@@ -52,14 +57,20 @@ const Task = con.db.define(
     vehicle_lon: {
       type: DataTypes.STRING,
     },
+    desc: {
+      type: DataTypes.STRING,
+    },
     path: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
     },
     filename: {
       type: DataTypes.STRING,
     },
-    desc: {
+    recurrent: {
       type: DataTypes.STRING,
+    },
+    createdBy: {
+      type: DataTypes.INTEGER,
     },
   },
   {

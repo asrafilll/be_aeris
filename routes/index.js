@@ -9,6 +9,8 @@ var Task = require("../controllers/task.js");
 var Vehicle = require("../controllers/vehicle.js");
 var Notification = require("../controllers/notification.js");
 var Setting = require("../controllers/setting.js");
+var CameraPlayback = require("../controllers/camera_playback.js");
+var Intercom = require("../controllers/intercom.js");
 var util = require("util");
 var futil = require("../config/utility.js");
 const path = require("path");
@@ -215,6 +217,44 @@ router.get(
   Auth.authAccessToken,
   function (req, res) {
     Setting.GetWhatsappNumber(req, res);
+  }
+);
+
+// ============================= CAMERA PLAYBACK ============================================================
+
+router.post(
+  "/api/pattern/camera/playback",
+  Auth.authAccessToken,
+  function (req, res) {
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ CAMERA PLAYBACK REQ HEADERS ] | INFO " +
+        util.inspect(req.headers)
+    );
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ CAMERA PLAYBACK REQ BODY ] | INFO " + util.inspect(req.body)
+    );
+    CameraPlayback.GetCameraPlayback(req, res);
+  }
+);
+
+// ============================= INTERCOM ============================================================
+
+router.post(
+  "/api/pattern/intercom",
+  Auth.authAccessToken,
+  function (req, res) {
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ INTERCOM REQ HEADERS ] | INFO " +
+        util.inspect(req.headers)
+    );
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ INTERCOM REQ BODY ] | INFO " + util.inspect(req.body)
+    );
+    Intercom.GetIntercom(req, res);
   }
 );
 

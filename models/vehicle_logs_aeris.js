@@ -6,8 +6,8 @@ var con = require("../config/database.js");
 const { DataTypes } = sequelize;
 
 // Define schema
-const Notification = con.db.define(
-  "notifications",
+const VehicleLogsAeris = con.db.define(
+  "vehicle_logs_aeris",
   {
     // Define attributes
     id: {
@@ -15,74 +15,59 @@ const Notification = con.db.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    uId: {
+    deviceId: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
-    vehicleUid: {
+    timestamp: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
-    vehicleId: {
+    deviceBatteryVoltage: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
-    severity: {
+    vehicleBatteryVoltage: {
       type: DataTypes.STRING,
-      allowNull: false,
-    },
-    type: {
-      type: DataTypes.STRING,
-      allowNull: false,
     },
     latitude: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     longitude: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
-    generatedMessage: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    send_date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    actualValue: {
+    heading: {
       type: DataTypes.STRING,
     },
-    plcSclId: {
-      type: DataTypes.STRING,
-    },
-    plcUId: {
-      type: DataTypes.STRING,
+    gpsSpeed: {
+      type: DataTypes.DOUBLE,
     },
     speed: {
+      type: DataTypes.DOUBLE,
+    },
+    ignitionStatus: {
       type: DataTypes.STRING,
     },
-    is_send: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+    fuelRawValue: {
+      type: DataTypes.STRING,
     },
-    address: {
-      type: DataTypes.TEXT,
+    assetBatteryVoltage: {
+      type: DataTypes.STRING,
     },
   },
   {
     // Freeze Table Name
     freezeTableName: true,
+    timestamps: false,
     indexes: [
       {
-        fields: ['uId']
+        fields: ['deviceId']
+      },
+      {
+        fields: ['timestamp']
       }
     ]
   }
 );
 
-// Export model Product
+// Export model
 module.exports = {
-  Notification,
+  VehicleLogsAeris,
 };
