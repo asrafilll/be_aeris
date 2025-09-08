@@ -1,7 +1,7 @@
 // var Model = require('../models/user.js')
 // var User = Model.User
 const db = require('../models');
-const User = db.user;
+const User = db.User;
 
 var axios = require('axios')
 var jwt = require('jsonwebtoken')
