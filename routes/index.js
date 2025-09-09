@@ -178,6 +178,14 @@ router.get(
   }
 );
 
+router.get(
+  "/api/pattern/notification/recent/:vehicleSclId",
+  Auth.authAccessToken,
+  function (req, res) {
+    Notification.GetRecentNotificationsByVehicleUid(req, res);
+  }
+);
+
 router.get("/api/pattern/history", Auth.authAccessToken, function (req, res) {
   Notification.GetHistory(req, res);
 });

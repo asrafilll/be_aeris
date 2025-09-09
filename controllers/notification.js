@@ -36,6 +36,36 @@ var GetNotificationByVehicleUid = async function (req, res) {
   }
 };
 
+const GetRecentNotificationsByVehicleUid = async (req, res) => {
+  try {
+    const now = new Date();
+    const twoMinutesAgo = new Date(now.getTime() - 2 * 60 * 1000);
+
+    const notifications = await Notification.findAll({
+      where: {
+        vehicleUid: req.params.vehicleSclId,
+        createdAt: {
+          [Op.between]: [twoMinutesAgo, now],
+        },
+      },
+      order: [["createdAt", "DESC"]],
+    });
+
+    result.code = 200;
+    result.status = "success";
+    result.data = notifications;
+    res.send(result);
+  } catch (err) {
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ ERROR ] | QUERING " + util.inspect(err)
+    );
+    result.code = 400;
+    result.status = "failed";
+    result.data = "Read data failed";
+    res.send(result);
+  }
+};
+
 const GetHistory = async (req, res) => {
   try {
     // Parse startDate and endDate from request query
@@ -78,5 +108,6 @@ const GetHistory = async (req, res) => {
 
 module.exports = {
   GetNotificationByVehicleUid,
+  GetRecentNotificationsByVehicleUid,
   GetHistory,
 };
