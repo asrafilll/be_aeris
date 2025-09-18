@@ -126,7 +126,7 @@ var Login = async function(req,res){
                         where: {
                             vehicleid: vehicleAssignment.vehicleid
                         },
-                        attributes: ['vin', 'deviceId', 'vehicleSclId', 'dashcamId', 'vehicleid', 'name', 'license_plate'],
+                        attributes: ['vin', 'deviceId', 'vehicleSclId', 'dashcamId', 'vehicleid', 'name', 'license_plate', 'vehicle_brand'],
                         raw: true
                     });
                     
