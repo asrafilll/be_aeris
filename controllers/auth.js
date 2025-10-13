@@ -172,65 +172,10 @@ var Login = async function(req,res){
     
             console.log("token:", token)
 
-            var url = process.env.URL_LOGIN_AERTRACK
-            var username = process.env.AERTRACK_USERNAME
-            var password = process.env.AERTRACK_PASSWORD
-         
-            var body ={
-             username: username,
-             password: password
-            }
-     
-           
-            futil.logger.debug('\n' + futil.shtm() + '- [ URL ]  ' + util.inspect(url));
-            futil.logger.debug('\n' + futil.shtm() + '- [ BODY REQUEST]  ' + util.inspect(body));
-     
-            axios.post(url,body).then(function (response) {
-
-                futil.logger.debug('\n' + futil.shtm() + '- [ RESPONSE DATA ]  ' + util.inspect(response.data));
-                var access_token = response.data.token
-                futil.setEnvValue("TOKEN_AERTRAK",access_token)
-                
-                res.setHeader("Content-Type", "application/json");
-                //res.cookie("token", token, { maxAge: jwtExpirySeconds * 1000 })
-                res.setHeader("token",token)
-                res.writeHead(200);
-                res.end(JSON.stringify(result, null, 3));
-
-
-            }).catch(function (error) {
-                
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE DATA ]  ' + util.inspect(error.response.data));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE STATUS ]  ' + util.inspect(error.response.status));
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR RESPONSE HEADER ]  ' + util.inspect(error.response.headers));
-                // console.log(error.response.data);
-                // console.log(error.response.status);
-                // console.log(error.response.headers);
-              } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR REQUEST ]  ' + util.inspect(error.request));
-                // console.log(error.request);
-              } else {
-                // Something happened in setting up the request that triggered an Error
-                // console.log('Error', error.message);
-                futil.logger.debug('\n' + futil.shtm() + '- [ ERROR ]  ' + util.inspect(error.message));
-              }
-              futil.logger.debug('\n' + futil.shtm() + '- [ ERROR CONFIG]  ' + util.inspect(error.config));
-            //   console.log(error.config);
-            var result = {  
-
-                "status":false,
-                "message": 'ERROR CONNECTION'
-            }
             res.setHeader("Content-Type", "application/json");
-            res.writeHead(400);
-            res.end(JSON.stringify(result,null,3));
-         })
+            res.setHeader("token",token)
+            res.writeHead(200);
+            res.end(JSON.stringify(result, null, 3));
     
            
         }else{
