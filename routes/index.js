@@ -200,6 +200,23 @@ router.get(
   }
 );
 
+router.get(
+  "/api/pattern/vehicle/history",
+  Auth.authAccessToken,
+  function (req, res) {
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ VEHICLE HISTORY REQ HEADERS ] | INFO " +
+        util.inspect(req.headers)
+    );
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ VEHICLE HISTORY REQ QUERY ] | INFO " + util.inspect(req.query)
+    );
+    Vehicle.GetVehicleHistory(req, res);
+  }
+);
+
 // ============================= PROFILE ============================================================
 
 router.get(

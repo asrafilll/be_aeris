@@ -1,8 +1,11 @@
 
 var ModelVehicle = require('../models/vehicle.js')
 var Vehicle = ModelVehicle.Vehicle
+var ModelVehicleLogsRoadcast = require('../models/vehicle_logs_roadcast.js')
+var VehicleLogsRoadcast = ModelVehicleLogsRoadcast.VehicleLogsRoadcast
 var util = require('util');
 var futil = require('../config/utility.js');
+const { Op } = require('sequelize');
 
 var result = {  
     "status":false,
@@ -78,6 +81,115 @@ var ReadOdometer = async function(req,res){
 }
 
 
+var GetVehicleHistory = async function(req, res) {
+    try {
+        futil.logger.debug('\n' + futil.shtm() + '- [ VEHICLE HISTORY ] | INFO ' + util.inspect(req.query));
+        
+        // Input validation
+        const { startDate, endDate, deviceId } = req.query;
+        
+        // Validate required fields
+        if (!startDate) {
+            const errorResult = {
+                code: 400,
+                status: 'failed',
+                message: 'startDate is required (format: YYYY-MM-DD)'
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | startDate missing');
+            return res.status(400).json(errorResult);
+        }
+        
+        if (!endDate) {
+            const errorResult = {
+                code: 400,
+                status: 'failed',
+                message: 'endDate is required (format: YYYY-MM-DD)'
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | endDate missing');
+            return res.status(400).json(errorResult);
+        }
+        
+        if (!deviceId) {
+            const errorResult = {
+                code: 400,
+                status: 'failed',
+                message: 'deviceId is required'
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | deviceId missing');
+            return res.status(400).json(errorResult);
+        }
+        
+        // Validate date format (YYYY-MM-DD)
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(startDate)) {
+            const errorResult = {
+                code: 400,
+                status: 'failed',
+                message: 'Invalid startDate format. Use YYYY-MM-DD'
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | Invalid startDate format');
+            return res.status(400).json(errorResult);
+        }
+        
+        if (!dateRegex.test(endDate)) {
+            const errorResult = {
+                code: 400,
+                status: 'failed',
+                message: 'Invalid endDate format. Use YYYY-MM-DD'
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | Invalid endDate format');
+            return res.status(400).json(errorResult);
+        }
+        
+        // Create date range for timestamp filtering
+        // Since timestamp is stored as string, we need to handle it accordingly
+        const startDateTime = `${startDate} 00:00:00`;
+        const endDateTime = `${endDate} 23:59:59`;
+        
+        futil.logger.debug('\n' + futil.shtm() + '- [ DATE RANGE ] | Start: ' + startDateTime + ' | End: ' + endDateTime);
+        futil.logger.debug('\n' + futil.shtm() + '- [ DEVICE ID ] | ' + deviceId);
+        
+        // Query vehicle logs
+        const vehicleLogs = await VehicleLogsRoadcast.findAll({
+            attributes: { exclude: ['id', 'deviceId', 'timestamp'] },
+            where: {
+                deviceId: deviceId,
+                timestamp: {
+                    [Op.between]: [startDateTime, endDateTime]
+                }
+            },
+            order: [['timestamp', 'ASC']]
+        });
+        
+        futil.logger.debug('\n' + futil.shtm() + '- [ VEHICLE LOGS COUNT ] | ' + vehicleLogs.length);
+        futil.logger.debug('\n' + futil.shtm() + '- [ VEHICLE LOGS SAMPLE ] | ' + util.inspect(vehicleLogs.slice(0, 2)));
+        
+        // Success response
+        const successResult = {
+            code: 200,
+            status: 'success',
+            data: vehicleLogs
+        };
+        
+        futil.logger.debug('\n' + futil.shtm() + '- [ VEHICLE HISTORY SUCCESS ] | Records found: ' + vehicleLogs.length);
+        
+        res.status(200).json(successResult);
+        
+    } catch (error) {
+        futil.logger.debug('\n' + futil.shtm() + '- [ VEHICLE HISTORY ERROR ] | ' + util.inspect(error));
+        
+        const errorResult = {
+            code: 500,
+            status: 'failed',
+            message: 'Internal server error',
+            error: error.message
+        };
+        
+        res.status(500).json(errorResult);
+    }
+};
+
 module.exports = {
-    ReadOdometer
+    ReadOdometer,
+    GetVehicleHistory
 }
