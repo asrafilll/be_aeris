@@ -82,7 +82,7 @@ var getCarsId = async function(vehicleSclId, token) {
 
 // Function to make single channel API call to external service for live monitoring
 var makeLiveChannelApiCall = async function(channel, carsId, deviceId, token) {
-    const apiUrl = `${process.env.API_WEB_URL}/monitors`;
+    const apiUrl = `${process.env.API_WEB_URL}/api/patern/video/monitors`;
     
     const requestBody = {
         carsId: carsId,
