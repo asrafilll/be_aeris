@@ -39,8 +39,7 @@ var getCarsId = async function(vehicleSclId, token) {
     futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST BODY ] | ' + util.inspect(requestBody));
 
     try {
-        const response = await axios.get(apiUrl, { 
-            data: requestBody,
+        const response = await axios.post(apiUrl, requestBody, { 
             headers: headers,
             timeout: 10000 // 10 second timeout
         });
