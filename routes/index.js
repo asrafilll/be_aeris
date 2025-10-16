@@ -247,6 +247,23 @@ router.post(
   }
 );
 
+router.post(
+  "/api/pattern/camera/live",
+  Auth.authAccessToken,
+  function (req, res) {
+    futil.logger.debug(
+      "\n" +
+        futil.shtm() +
+        "- [ CAMERA LIVE REQ HEADERS ] | INFO " +
+        util.inspect(req.headers)
+    );
+    futil.logger.debug(
+      "\n" + futil.shtm() + "- [ CAMERA LIVE REQ BODY ] | INFO " + util.inspect(req.body)
+    );
+    CameraPlayback.GetCameraLive(req, res);
+  }
+);
+
 // ============================= INTERCOM ============================================================
 
 router.post(

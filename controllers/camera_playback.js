@@ -21,9 +21,120 @@ var validateDateFormat = function(dateString) {
     return dateRegex.test(dateString);
 };
 
+// Function to get carsId from external service
+var getCarsId = async function(vehicleSclId, token) {
+    const apiUrl = `${process.env.API_WEB_URL}/api/patern/video/cameras`;
+    
+    const requestBody = {
+        tag: [vehicleSclId]
+    };
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'token': token
+    };
+
+    futil.logger.debug('\n' + futil.shtm() + '- [ GET CARS ID API CALL ] | URL: ' + apiUrl);
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADERS ] | ' + util.inspect(headers));
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST BODY ] | ' + util.inspect(requestBody));
+
+    try {
+        const response = await axios.get(apiUrl, { 
+            data: requestBody,
+            headers: headers,
+            timeout: 10000 // 10 second timeout
+        });
+        
+        futil.logger.debug('\n' + futil.shtm() + '- [ GET CARS ID API RESPONSE ] | ' + util.inspect(response.data));
+        
+        // Extract carsId from response
+        if (response.data && response.data.data && response.data.data[0] && response.data.data[0].cars && response.data.data[0].cars[0]) {
+            const carsId = response.data.data[0].cars[0].carId;
+            futil.logger.debug('\n' + futil.shtm() + '- [ EXTRACTED CARS ID ] | ' + carsId);
+            return {
+                success: true,
+                carsId: carsId
+            };
+        } else {
+            futil.logger.debug('\n' + futil.shtm() + '- [ GET CARS ID ERROR ] | Invalid response structure');
+            return {
+                success: false,
+                error: 'Invalid response structure - carsId not found'
+            };
+        }
+        
+    } catch (error) {
+        futil.logger.debug('\n' + futil.shtm() + '- [ GET CARS ID API ERROR ] | ' + util.inspect(error.message));
+        
+        let errorMessage = 'External API error';
+        if (error.response) {
+            errorMessage = `HTTP ${error.response.status}: ${error.response.statusText}`;
+            futil.logger.debug('\n' + futil.shtm() + '- [ GET CARS ID API ERROR RESPONSE ] | ' + util.inspect(error.response.data));
+        } else if (error.request) {
+            errorMessage = 'Network error - no response received';
+        }
+        
+        return {
+            success: false,
+            error: errorMessage
+        };
+    }
+};
+
+// Function to make single channel API call to external service for live monitoring
+var makeLiveChannelApiCall = async function(channel, carsId, deviceId, token) {
+    const apiUrl = `${process.env.API_WEB_URL}/monitors`;
+    
+    const requestBody = {
+        carsId: carsId,
+        channel: channel,
+        deviceId: deviceId
+    };
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'token': token
+    };
+
+    futil.logger.debug('\n' + futil.shtm() + '- [ LIVE EXTERNAL API CALL ] | Channel: ' + channel + ' | URL: ' + apiUrl);
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST HEADERS ] | ' + util.inspect(headers));
+    futil.logger.debug('\n' + futil.shtm() + '- [ REQUEST BODY ] | ' + util.inspect(requestBody));
+
+    try {
+        const response = await axios.post(apiUrl, requestBody, { 
+            headers: headers,
+            timeout: 10000 // 10 second timeout
+        });
+        
+        futil.logger.debug('\n' + futil.shtm() + '- [ LIVE EXTERNAL API RESPONSE ] | Channel: ' + channel + ' | ' + util.inspect(response.data));
+        
+        return {
+            success: true,
+            channel: channel,
+            data: response.data
+        };
+    } catch (error) {
+        futil.logger.debug('\n' + futil.shtm() + '- [ LIVE EXTERNAL API ERROR ] | Channel: ' + channel + ' | ' + util.inspect(error.message));
+        
+        let errorMessage = 'External API error';
+        if (error.response) {
+            errorMessage = `HTTP ${error.response.status}: ${error.response.statusText}`;
+            futil.logger.debug('\n' + futil.shtm() + '- [ LIVE EXTERNAL API ERROR RESPONSE ] | ' + util.inspect(error.response.data));
+        } else if (error.request) {
+            errorMessage = 'Network error - no response received';
+        }
+        
+        return {
+            success: false,
+            channel: channel,
+            error: errorMessage
+        };
+    }
+};
+
 // Function to make single channel API call to external service
 var makeChannelApiCall = async function(channel, deviceId, startTime, endTime, token) {
-    const apiUrl = `${process.env.API_WEB_URL}/monitors`;
+    const apiUrl = `${process.env.API_WEB_URL}/monitors-playback`;
     
     const requestBody = {
         channel: channel,
@@ -230,6 +341,129 @@ var GetCameraPlayback = async function(req, res) {
     }
 };
 
+// Main camera live controller function
+var GetCameraLive = async function(req, res) {
+    try {
+        futil.logger.debug('\n' + futil.shtm() + '- [ CAMERA LIVE ] | INFO ' + util.inspect(req.body));
+        
+        // Input validation
+        const { vehicleSclId, dashcamId, token } = req.body;
+        
+        // Validate required fields
+        if (!vehicleSclId) {
+            const errorResult = {
+                code: 400,
+                status: 'failed',
+                message: 'vehicleSclId is required'
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | vehicleSclId missing');
+            return res.status(400).json(errorResult);
+        }
+        
+        if (!dashcamId) {
+            const errorResult = {
+                code: 400,
+                status: 'failed',
+                message: 'dashcamId is required'
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | dashcamId missing');
+            return res.status(400).json(errorResult);
+        }
+        
+        if (!token) {
+            const errorResult = {
+                code: 400,
+                status: 'failed',
+                message: 'token is required'
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | token missing');
+            return res.status(400).json(errorResult);
+        }
+        
+        // Check if API_WEB_URL is configured
+        if (!process.env.API_WEB_URL) {
+            const errorResult = {
+                code: 500,
+                status: 'failed',
+                message: 'API_WEB_URL not configured'
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ CONFIG ERROR ] | API_WEB_URL missing');
+            return res.status(500).json(errorResult);
+        }
+        
+        // Step 1: Get carsId from external service
+        futil.logger.debug('\n' + futil.shtm() + '- [ GET CARS ID ] | vehicleSclId: ' + vehicleSclId);
+        
+        const carsIdResult = await getCarsId(vehicleSclId, token);
+        
+        if (!carsIdResult.success) {
+            const errorResult = {
+                code: 500,
+                status: 'failed',
+                message: 'Failed to get carsId',
+                error: carsIdResult.error
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ GET CARS ID FAILED ] | ' + util.inspect(errorResult));
+            return res.status(500).json(errorResult);
+        }
+        
+        const carsId = carsIdResult.carsId;
+        futil.logger.debug('\n' + futil.shtm() + '- [ CARS ID OBTAINED ] | carsId: ' + carsId);
+        
+        // Step 2: Make parallel API calls for all 3 channels
+        futil.logger.debug('\n' + futil.shtm() + '- [ PARALLEL LIVE API CALLS ] | Starting calls for channels 1, 2, 3');
+        
+        const channelPromises = [
+            makeLiveChannelApiCall(1, carsId, dashcamId, token), // Front
+            makeLiveChannelApiCall(2, carsId, dashcamId, token), // Driver
+            makeLiveChannelApiCall(3, carsId, dashcamId, token)  // Rear
+        ];
+        
+        const channelResults = await Promise.all(channelPromises);
+        
+        futil.logger.debug('\n' + futil.shtm() + '- [ PARALLEL LIVE API RESULTS ] | ' + util.inspect(channelResults));
+        
+        // Aggregate responses
+        const aggregatedResult = aggregateChannelResponses(channelResults);
+        
+        if (!aggregatedResult.hasAnySuccess) {
+            // All channels failed
+            const errorResult = {
+                code: 500,
+                status: 'failed',
+                message: 'All camera channels failed to load',
+                data: aggregatedResult.data
+            };
+            futil.logger.debug('\n' + futil.shtm() + '- [ ALL LIVE CHANNELS FAILED ] | ' + util.inspect(errorResult));
+            return res.status(500).json(errorResult);
+        }
+        
+        // Success response (even if some channels failed)
+        const successResult = {
+            code: 200,
+            status: 'success',
+            data: aggregatedResult.data
+        };
+        
+        futil.logger.debug('\n' + futil.shtm() + '- [ CAMERA LIVE SUCCESS ] | ' + util.inspect(successResult));
+        
+        res.status(200).json(successResult);
+        
+    } catch (error) {
+        futil.logger.debug('\n' + futil.shtm() + '- [ CAMERA LIVE ERROR ] | ' + util.inspect(error));
+        
+        const errorResult = {
+            code: 500,
+            status: 'failed',
+            message: 'Internal server error',
+            error: error.message
+        };
+        
+        res.status(500).json(errorResult);
+    }
+};
+
 module.exports = {
-    GetCameraPlayback
+    GetCameraPlayback,
+    GetCameraLive
 };
