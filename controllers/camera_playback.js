@@ -23,7 +23,7 @@ var validateDateFormat = function(dateString) {
 
 // Function to make single channel API call to external service
 var makeChannelApiCall = async function(channel, deviceId, startTime, endTime, token) {
-    const apiUrl = `${process.env.API_WEB_URL}/api/patern/video/monitors-playback`;
+    const apiUrl = `${process.env.API_WEB_URL}/monitors`;
     
     const requestBody = {
         channel: channel,
@@ -109,16 +109,16 @@ var GetCameraPlayback = async function(req, res) {
         futil.logger.debug('\n' + futil.shtm() + '- [ CAMERA PLAYBACK ] | INFO ' + util.inspect(req.body));
         
         // Input validation
-        const { deviceId, startTime, endTime, token } = req.body;
+        const { dashcamId, startTime, endTime, token } = req.body;
         
         // Validate required fields
-        if (!deviceId) {
+        if (!dashcamId) {
             const errorResult = {
                 code: 400,
                 status: 'failed',
-                message: 'deviceId is required'
+                message: 'dashcamId is required'
             };
-            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | deviceId missing');
+            futil.logger.debug('\n' + futil.shtm() + '- [ VALIDATION ERROR ] | dashcamId missing');
             return res.status(400).json(errorResult);
         }
         
@@ -181,9 +181,9 @@ var GetCameraPlayback = async function(req, res) {
         futil.logger.debug('\n' + futil.shtm() + '- [ PARALLEL API CALLS ] | Starting calls for channels 1, 2, 3');
         
         const channelPromises = [
-            makeChannelApiCall(1, deviceId, finalStartTime, finalEndTime, token), // Front
-            makeChannelApiCall(2, deviceId, finalStartTime, finalEndTime, token), // Driver
-            makeChannelApiCall(3, deviceId, finalStartTime, finalEndTime, token)  // Rear
+            makeChannelApiCall(1, dashcamId, finalStartTime, finalEndTime, token), // Front
+            makeChannelApiCall(2, dashcamId, finalStartTime, finalEndTime, token), // Driver
+            makeChannelApiCall(3, dashcamId, finalStartTime, finalEndTime, token)  // Rear
         ];
         
         const channelResults = await Promise.all(channelPromises);
