@@ -125,7 +125,7 @@ const GetHistory = async (req, res) => {
       attributes: [
         "latitude",
         "longitude",
-        "createdAt",
+        "send_date",
         "speed",
         "actualValue",
       ],
