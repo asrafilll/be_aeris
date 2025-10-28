@@ -68,6 +68,23 @@ const GetRecentNotificationsByVehicleUid = async (req, res) => {
 
 const GetHistory = async (req, res) => {
   try {
+    // Extract username from JWT token
+    const token = req.headers.token;
+    const jwt = require('jsonwebtoken');
+    const payload = jwt.verify(token, process.env.TOKEN_SECRET);
+    const username = payload.username;
+    
+    // Get user's actual vehicleId from token
+    const User = require("../models").User;
+    const Vehicle_User = require("../models/vehicle_user.js").Vehicle_User;
+    
+    const user = await User.findOne({ where: { username } });
+    const vehicleAssignment = await Vehicle_User.findOne({
+      where: { userid: user.id },
+      order: [["createdAt", "DESC"]]
+    });
+    const userVehicleId = vehicleAssignment?.vehicleid;
+    
     // Parse startDate and endDate from request query
     const { startDate, endDate } = req.query;
 
@@ -84,7 +101,7 @@ const GetHistory = async (req, res) => {
         createdAt: {
           [Op.between]: [startDate, endDate],
         },
-        vehicleId: req.query.vehicleId,
+        vehicleId: userVehicleId, // Use user's vehicleId from token instead of query
         type: "geofence",
       },
       order: [["createdAt", "DESC"]],
