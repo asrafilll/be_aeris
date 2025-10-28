@@ -90,21 +90,35 @@ const GetHistory = async (req, res) => {
       order: [["createdAt", "DESC"]]
     });
     console.log("Vehicle assignment:", vehicleAssignment ? {
-      sclId: vehicleAssignment.sclId,
+      sclid: vehicleAssignment.sclid,
       vehicleid: vehicleAssignment.vehicleid
     } : "not found");
     
-    const userVehicleUid = vehicleAssignment?.sclId; // Use sclId instead of vehicleid
+    const userVehicleUid = vehicleAssignment?.sclid; // Use sclid instead of vehicleid
     console.log("Using vehicleUid for query:", userVehicleUid);
     
     // Parse startDate and endDate from request query
-    const { startDate, endDate } = req.query;
+    let { startDate, endDate } = req.query;
     console.log("Date range (raw):", { startDate, endDate });
+    
+    // Normalize date format (ensure YYYY-MM-DD)
+    if (startDate && startDate.length < 10) {
+      const dateParts = startDate.split('-');
+      if (dateParts.length === 3) {
+        startDate = `${dateParts[0]}-${dateParts[1].padStart(2, '0')}-${dateParts[2].padStart(2, '0')}`;
+      }
+    }
+    if (endDate && endDate.length < 10) {
+      const dateParts = endDate.split('-');
+      if (dateParts.length === 3) {
+        endDate = `${dateParts[0]}-${dateParts[1].padStart(2, '0')}-${dateParts[2].padStart(2, '0')}`;
+      }
+    }
     
     // Convert to proper Date objects to ensure full day coverage
     const startDateTime = new Date(startDate + "T00:00:00.000Z");
     const endDateTime = new Date(endDate + "T23:59:59.999Z");
-    console.log("Date range (converted):", { startDateTime, endDateTime });
+    console.log("Date range (normalized and converted):", { startDate, endDate, startDateTime, endDateTime });
 
     // Fetch data from the database based on the provided criteria
     const history = await Notification.findAll({
