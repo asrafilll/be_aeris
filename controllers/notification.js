@@ -68,25 +68,43 @@ const GetRecentNotificationsByVehicleUid = async (req, res) => {
 
 const GetHistory = async (req, res) => {
   try {
+    console.log("=== GetHistory Debug Info ===");
+    console.log("Request query:", req.query);
+    
     // Extract username from JWT token
     const token = req.headers.token;
     const jwt = require('jsonwebtoken');
     const payload = jwt.verify(token, process.env.TOKEN_SECRET);
     const username = payload.username;
+    console.log("Username from token:", username);
     
-    // Get user's actual vehicleId from token
+    // Get user's actual sclId from token
     const User = require("../models").User;
     const Vehicle_User = require("../models/vehicle_user.js").Vehicle_User;
     
     const user = await User.findOne({ where: { username } });
+    console.log("User found:", user ? user.id : "not found");
+    
     const vehicleAssignment = await Vehicle_User.findOne({
       where: { userid: user.id },
       order: [["createdAt", "DESC"]]
     });
-    const userVehicleId = vehicleAssignment?.vehicleid;
+    console.log("Vehicle assignment:", vehicleAssignment ? {
+      sclId: vehicleAssignment.sclId,
+      vehicleid: vehicleAssignment.vehicleid
+    } : "not found");
+    
+    const userVehicleUid = vehicleAssignment?.sclId; // Use sclId instead of vehicleid
+    console.log("Using vehicleUid for query:", userVehicleUid);
     
     // Parse startDate and endDate from request query
     const { startDate, endDate } = req.query;
+    console.log("Date range (raw):", { startDate, endDate });
+    
+    // Convert to proper Date objects to ensure full day coverage
+    const startDateTime = new Date(startDate + "T00:00:00.000Z");
+    const endDateTime = new Date(endDate + "T23:59:59.999Z");
+    console.log("Date range (converted):", { startDateTime, endDateTime });
 
     // Fetch data from the database based on the provided criteria
     const history = await Notification.findAll({
@@ -99,13 +117,17 @@ const GetHistory = async (req, res) => {
       ],
       where: {
         createdAt: {
-          [Op.between]: [startDate, endDate],
+          [Op.between]: [startDateTime, endDateTime],
         },
-        vehicleId: userVehicleId, // Use user's vehicleId from token instead of query
+        vehicleUid: userVehicleUid, // Use vehicleUid instead of vehicleId
         type: "geofence",
       },
       order: [["createdAt", "DESC"]],
     });
+
+    console.log("Query result count:", history.length);
+    console.log("First few results:", history.slice(0, 2));
+    console.log("=== End Debug Info ===");
 
     res.json({
       code: 200,
