@@ -130,7 +130,7 @@ const GetHistory = async (req, res) => {
         "actualValue",
       ],
       where: {
-        createdAt: {
+        send_date: {
           [Op.between]: [startDateTime, endDateTime],
         },
         vehicleUid: userVehicleUid, // Use vehicleUid instead of vehicleId
@@ -141,6 +141,28 @@ const GetHistory = async (req, res) => {
 
     console.log("Query result count:", history.length);
     console.log("First few results:", history.slice(0, 2));
+    
+    // Debug: Check what data exists for this vehicleUid
+    const debugQuery = await Notification.findAll({
+      attributes: ["vehicleUid", "vehicleId", "type", "createdAt"],
+      where: { vehicleUid: userVehicleUid },
+      limit: 5,
+      order: [["createdAt", "DESC"]]
+    });
+    console.log("Debug - All records for this vehicleUid:", debugQuery);
+    
+    // Debug: Check geofence records regardless of date
+    const geofenceQuery = await Notification.findAll({
+      attributes: ["vehicleUid", "vehicleId", "type", "createdAt"],
+      where: { 
+        vehicleUid: userVehicleUid,
+        type: "geofence"
+      },
+      limit: 5,
+      order: [["createdAt", "DESC"]]
+    });
+    console.log("Debug - Geofence records for this vehicleUid:", geofenceQuery);
+    
     console.log("=== End Debug Info ===");
 
     res.json({
